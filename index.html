@@ -106,10 +106,9 @@
 </div>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-    // Используем публичный сервер PeerJS (иногда глючит, но работает)
-    // Если сервер недоступен, попробуй заменить на 'peerjs-server.herokuapp.com' (порт 443, secure: true)
+    // Пробуем альтернативный публичный сервер (herokuapp)
     const peer = new Peer({
-        host: '0.peerjs.com',
+        host: 'peerjs-server.herokuapp.com',
         port: 443,
         path: '/',
         secure: true
@@ -139,7 +138,7 @@
 
     peer.on('error', (err) => {
         console.error(err);
-        statusDiv.innerHTML = '❌ Ошибка: ' + err.type + '. Попробуйте обновить страницу.';
+        statusDiv.innerHTML = '❌ Ошибка: ' + err.type + '. Попробуйте обновить страницу. Если ошибка повторяется, возможно, сервер временно недоступен.';
     });
 
     connectBtn.addEventListener('click', () => {
