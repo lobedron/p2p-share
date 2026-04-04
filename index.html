@@ -24,7 +24,6 @@
             perspective: 1000px;
         }
 
-        /* динамический фон (звёзды + дождь) */
         #dynamicCanvas {
             position: fixed;
             top: 0; left: 0;
@@ -33,7 +32,6 @@
             pointer-events: none;
         }
 
-        /* облака / размытые пятна */
         .cloud {
             position: absolute;
             background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%);
@@ -43,18 +41,16 @@
             pointer-events: none;
         }
 
-        /* основной контейнер с параллаксом */
         .container {
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 650px;
+            max-width: 700px;
             margin: 0 auto;
-            padding: 28px 24px 32px;
+            padding: 20px;
             transition: transform 0.1s ease-out;
         }
 
-        /* стеклянная карточка */
         .glass-card {
             background: rgba(18, 20, 24, 0.85);
             backdrop-filter: blur(35px);
@@ -62,15 +58,12 @@
             border-radius: 48px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02);
-            transition: box-shadow 0.3s ease, transform 0.2s;
-        }
-
-        .glass-card:hover {
-            box-shadow: 0 35px 55px -15px rgba(0, 0, 0, 1);
+            transition: box-shadow 0.3s ease;
+            padding: 28px 26px 32px;
         }
 
         h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 800;
             letter-spacing: -2px;
             background: linear-gradient(135deg, #fff 0%, #aaa 100%);
@@ -79,7 +72,6 @@
             color: transparent;
             text-align: center;
             margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .sub {
@@ -91,7 +83,6 @@
             text-transform: uppercase;
         }
 
-        /* верхняя панель: две кнопки по краям */
         .top-bar {
             display: flex;
             align-items: center;
@@ -113,85 +104,23 @@
             transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             min-width: 160px;
             text-align: center;
-            letter-spacing: 1px;
         }
 
         .action-btn:hover {
             background: rgba(35, 38, 45, 0.9);
             border-color: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 12px 25px -10px black;
         }
 
-        /* панели действий (анимированные) */
         .action-panel {
             display: none;
             margin: 20px 0;
-            animation: panelFadeIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes panelFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .panel-closing {
-            animation: panelFadeOut 0.25s forwards !important;
-        }
-
-        @keyframes panelFadeOut {
-            to {
-                opacity: 0;
-                transform: translateY(15px);
-                display: none;
-            }
-        }
-
-        /* индикатор сигнала — центрирован */
-        .signal {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            margin: 0 auto 20px auto;
-            width: fit-content;
-            transition: opacity 0.2s;
-        }
-
-        .signal-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 5px;
-            height: 22px;
-        }
-
-        .bar {
-            width: 5px;
-            background: rgba(255,255,255,0.3);
-            transition: all 0.2s;
-            border-radius: 3px;
-        }
-        .bar1 { height: 6px; }
-        .bar2 { height: 10px; }
-        .bar3 { height: 14px; }
-
-        .signal.disconnected .bar {
-            background: rgba(255,255,255,0.15);
-            opacity: 0.6;
-        }
-        .signal-cross {
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-            display: none;
-        }
-        .signal.disconnected .signal-cross {
-            display: inline-block;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .input-group {
@@ -207,7 +136,7 @@
             margin-bottom: 8px;
         }
 
-        input {
+        input, textarea {
             width: 100%;
             background: rgba(10, 12, 18, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -217,12 +146,17 @@
             font-size: 0.9rem;
             outline: none;
             transition: all 0.2s;
+            font-family: inherit;
         }
 
-        input:focus {
+        textarea {
+            border-radius: 24px;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus {
             border-color: rgba(255, 255, 255, 0.4);
             background: #0c0f16;
-            box-shadow: 0 0 12px rgba(255,255,255,0.05);
         }
 
         button {
@@ -236,7 +170,6 @@
             cursor: pointer;
             transition: all 0.2s ease;
             margin-bottom: 12px;
-            backdrop-filter: blur(5px);
         }
 
         button:hover {
@@ -250,17 +183,92 @@
             margin-top: 4px;
         }
 
-        /* панель файлов */
+        .lobby-container {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .lobby-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .room-id-badge {
+            background: rgba(0,0,0,0.5);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .participant-status {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75rem;
+        }
+
+        .chat-area {
+            margin: 20px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+        }
+
+        .messages {
+            background: rgba(0,0,0,0.3);
+            border-radius: 24px;
+            padding: 16px;
+            height: 200px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            background: rgba(255,255,255,0.05);
+            padding: 8px 12px;
+            border-radius: 20px;
+            width: fit-content;
+            max-width: 80%;
+            word-break: break-word;
+            font-size: 0.85rem;
+        }
+
+        .message.own {
+            align-self: flex-end;
+            background: rgba(100, 108, 255, 0.2);
+            border: 1px solid rgba(100,108,255,0.3);
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .chat-input button {
+            width: auto;
+            padding: 0 24px;
+            margin-bottom: 0;
+        }
+
         .file-panel {
-            margin-top: 28px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 24px;
-            transition: all 0.3s;
+            margin-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
         }
 
         .file-row {
             background: rgba(15, 17, 25, 0.7);
-            backdrop-filter: blur(5px);
             border-radius: 24px;
             padding: 12px 18px;
             margin-bottom: 12px;
@@ -268,12 +276,6 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: 0.2s;
-        }
-
-        .file-row:hover {
-            background: rgba(30, 33, 45, 0.8);
-            border-color: rgba(255,255,255,0.15);
         }
 
         .file-row a {
@@ -283,30 +285,28 @@
             padding: 5px 14px;
             border-radius: 40px;
             font-size: 0.75rem;
-            transition: 0.2s;
-        }
-        .file-row a:hover {
-            background: #2f384b;
-            color: white;
         }
 
         .status-text {
             font-size: 0.75rem;
             color: rgba(255,255,255,0.5);
             text-align: center;
-            margin-top: 24px;
-            letter-spacing: 0.5px;
+            margin-top: 20px;
         }
 
-        /* анимация для кнопки назад */
-        .fade-out {
-            animation: fadeOutEl 0.25s forwards;
+        .error-msg {
+            color: #ff8888;
+            background: rgba(255,0,0,0.1);
+            padding: 8px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 12px;
         }
 
-        @keyframes fadeOutEl {
-            to { opacity: 0; transform: scale(0.98); display: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
     </style>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
@@ -317,31 +317,47 @@
 <div class="cloud" style="width: 700px; height: 700px; bottom: -20%; right: -10%;"></div>
 
 <div class="container" id="mainContainer">
-    <div class="glass-card" style="padding: 28px 26px 32px;">
+    <div class="glass-card">
         <h1>⚡ LOBESHARE</h1>
-        <div class="sub">кастомный Файлообменник</div>
+        <div class="sub">кастомный файлообменник</div>
 
-        <div class="top-bar">
-            <button id="showCreateBtn" class="action-btn">📎 СОЗДАТЬ</button>
-            <button id="showJoinBtn" class="action-btn">🔗 ПОДКЛЮЧИТЬСЯ</button>
+        <!-- Начальные кнопки -->
+        <div id="startPanel">
+            <div class="top-bar">
+                <button id="showCreateBtn" class="action-btn">📎 СОЗДАТЬ</button>
+                <button id="showJoinBtn" class="action-btn">🔗 ПОДКЛЮЧИТЬСЯ</button>
+            </div>
+            <div id="dynamicArea"></div>
         </div>
 
-        <div id="dynamicArea"></div>
-
-        <div id="fileTransferZone" style="display: none;" class="file-panel">
-            <div class="input-group">
-                <label>📁 ВЫБРАТЬ ФАЙЛ</label>
-                <input type="file" id="fileInput">
+        <!-- Лобби (комната) -->
+        <div id="lobbyPanel" class="lobby-container">
+            <div class="lobby-header">
+                <div class="room-id-badge" id="lobbyRoomId">—</div>
+                <div class="participant-status" id="participantStatus">Ожидание подключения...</div>
             </div>
-            <button id="sendFileBtn">📤 ОТПРАВИТЬ ФАЙЛ</button>
-            <div style="margin: 20px 0 10px; font-weight: 500;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
-            <div id="receivedFilesList"></div>
+            <div class="chat-area">
+                <div class="messages" id="chatMessages"></div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Сообщение..." disabled>
+                    <button id="sendChatBtn" disabled>📤</button>
+                </div>
+            </div>
+            <div id="fileTransferZone" style="display: none;" class="file-panel">
+                <div class="input-group">
+                    <label>📁 ВЫБРАТЬ ФАЙЛ</label>
+                    <input type="file" id="fileInput">
+                </div>
+                <button id="sendFileBtn">📤 ОТПРАВИТЬ ФАЙЛ</button>
+                <div style="margin: 16px 0 8px; font-weight: 500;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
+                <div id="receivedFilesList"></div>
+            </div>
+            <button id="leaveLobbyBtn" class="back-btn">← ВЫЙТИ ИЗ КОМНАТЫ</button>
         </div>
 
         <div id="statusMessage" class="status-text"></div>
     </div>
 </div>
-
 
 <script>
     // ---------- ФОН (звёзды + дождь) ----------
@@ -366,8 +382,6 @@
                 y: Math.random() * height,
                 size: Math.random() * 2.5,
                 alpha: Math.random() * 0.8,
-                driftX: (Math.random() - 0.5) * 0.2,
-                driftY: (Math.random() - 0.5) * 0.2
             });
         }
     }
@@ -386,7 +400,6 @@
 
     function drawBackground() {
         ctx.clearRect(0, 0, width, height);
-        // звёзды с параллаксом от мыши
         stars.forEach(s => {
             let offsetX = mouseX * 25;
             let offsetY = mouseY * 15;
@@ -401,8 +414,6 @@
             ctx.arc(sx, sy, s.size, 0, Math.PI*2);
             ctx.fill();
         });
-
-        // дождь
         ctx.strokeStyle = "rgba(255,255,255,0.12)";
         ctx.lineWidth = 1.2;
         drops.forEach(d => {
@@ -420,778 +431,422 @@
     }
 
     window.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX / width) - 0.5;
-        mouseY = (e.clientY / height) - 0.5;
-        const container = document.getElementById('mainContainer');
-        if(container) container.style.transform = `translate(${mouseX * 10}px, ${mouseY * 10}px)`;
+        if(width && height) {
+            mouseX = (e.clientX / width) - 0.5;
+            mouseY = (e.clientY / height) - 0.5;
+            const container = document.getElementById('mainContainer');
+            if(container) container.style.transform = `translate(${mouseX * 10}px, ${mouseY * 10}px)`;
+        }
     });
 
-    window.addEventListener('resize', () => {
-        resizeCanvas();
-    });
+    window.addEventListener('resize', () => { resizeCanvas(); });
     resizeCanvas();
     drawBackground();
 
-    
-
-    // ---------- ФАЙЛООБМЕННИК (КОМНАТЫ) ----------
+    // ---------- ЛОГИКА КОМНАТ И ЧАТА ----------
     const SIGNALING_SERVER = 'https://webrtc-signal-server-2.onrender.com';
-    const socket = io(SIGNALING_SERVER, { transports: ['websocket', 'polling'] });
-
+    let socket = null;
     let currentRoomId = null;
+    let isInLobby = false;
     let peerConnection = null;
     let dataChannel = null;
     let isConnected = false;
 
-    const showCreate = document.getElementById('showCreateBtn');
-    const showJoin = document.getElementById('showJoinBtn');
+    const startPanel = document.getElementById('startPanel');
+    const lobbyPanel = document.getElementById('lobbyPanel');
+    const showCreateBtn = document.getElementById('showCreateBtn');
+    const showJoinBtn = document.getElementById('showJoinBtn');
     const dynamicArea = document.getElementById('dynamicArea');
+    const statusMsg = document.getElementById('statusMessage');
+    const lobbyRoomIdSpan = document.getElementById('lobbyRoomId');
+    const participantStatusSpan = document.getElementById('participantStatus');
+    const chatMessagesDiv = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const sendChatBtn = document.getElementById('sendChatBtn');
     const fileZone = document.getElementById('fileTransferZone');
     const fileInput = document.getElementById('fileInput');
-    const sendBtn = document.getElementById('sendFileBtn');
-    const receivedContainer = document.getElementById('receivedFilesList');
-    const statusMsg = document.getElementById('statusMessage');
+    const sendFileBtn = document.getElementById('sendFileBtn');
+    const receivedFilesList = document.getElementById('receivedFilesList');
+    const leaveLobbyBtn = document.getElementById('leaveLobbyBtn');
 
-    // шаблоны панелей с индикатором внутри
-    const createPanelHtml = `
-        <div id="createPanel" class="action-panel" style="display: block;">
-            <div id="signalCreate" class="signal disconnected">
-                <div class="signal-bars"><div class="bar bar1"></div><div class="bar bar2"></div><div class="bar bar3"></div></div>
-                <span class="signal-cross">✕</span>
-            </div>
-            <div class="input-group"><label>ID комнаты</label><input type="text" id="myRoomName" placeholder="ID" maxlength="20"></div>
-            <button id="createRoomBtn">СОЗДАТЬ КОМНАТУ</button>
-            <button id="backFromCreate" class="back-btn">← НАЗАД</button>
-        </div>
-    `;
-    const joinPanelHtml = `
-        <div id="joinPanel" class="action-panel" style="display: block;">
-            <div id="signalJoin" class="signal disconnected">
-                <div class="signal-bars"><div class="bar bar1"></div><div class="bar bar2"></div><div class="bar bar3"></div></div>
-                <span class="signal-cross">✕</span>
-            </div>
-            <div class="input-group"><label>ID комнаты</label><input type="text" id="joinRoomName" placeholder="ID"></div>
-            <button id="joinRoomBtn">🔗 ПОДКЛЮЧИТЬСЯ</button>
-            <button id="backFromJoin" class="back-btn">← НАЗАД</button>
-        </div>
-    `;
+    let isHost = false;
 
     function setStatus(text, isError = false) {
         statusMsg.innerHTML = text;
-        if (isError) setTimeout(() => { if (statusMsg.innerHTML === text) statusMsg.innerHTML = ''; }, 3000);
+        if (isError) setTimeout(() => {
+            if (statusMsg.innerHTML === text) statusMsg.innerHTML = '';
+        }, 4000);
     }
 
-    function updateSignal(connected) {
-        document.querySelectorAll('.signal').forEach(sig => {
-            if (connected) sig.classList.remove('disconnected');
-            else sig.classList.add('disconnected');
+    function showError(text) {
+        const errDiv = document.createElement('div');
+        errDiv.className = 'error-msg';
+        errDiv.innerText = text;
+        dynamicArea.appendChild(errDiv);
+        setTimeout(() => errDiv.remove(), 4000);
+        setStatus(text, true);
+    }
+
+    function connectToSignaling(callback) {
+        if (socket && socket.connected) {
+            callback(true);
+            return;
+        }
+        socket = io(SIGNALING_SERVER, { transports: ['websocket', 'polling'] });
+        socket.on('connect', () => {
+            setStatus('✅ сигнальный сервер готов');
+            callback(true);
+        });
+        socket.on('connect_error', (err) => {
+            showError('❌ не удалось подключиться к сигнальному серверу. Проверьте интернет.');
+            callback(false);
         });
     }
 
-    function clearTransferUI() {
-        if (dataChannel) try { dataChannel.close(); } catch(e) {}
-        if (peerConnection) try { peerConnection.close(); } catch(e) {}
-        dataChannel = null;
-        peerConnection = null;
-        isConnected = false;
+    function createRoom(roomId) {
+        if (!socket || !socket.connected) {
+            showError('Нет соединения с сервером');
+            return;
+        }
+        socket.emit('create-room', { roomId }, (response) => {
+            if (response && response.error) {
+                showError(`Ошибка: ${response.error}`);
+                return;
+            }
+            enterLobby(roomId, true);
+        });
+    }
+
+    function joinRoom(roomId) {
+        if (!socket || !socket.connected) {
+            showError('Нет соединения с сервером');
+            return;
+        }
+        socket.emit('join-room', { roomId }, (response) => {
+            if (response && response.error) {
+                showError(`Ошибка: ${response.error}`);
+                return;
+            }
+            enterLobby(roomId, false);
+        });
+    }
+
+    function enterLobby(roomId, host) {
+        currentRoomId = roomId;
+        isHost = host;
+        isInLobby = true;
+        startPanel.style.display = 'none';
+        lobbyPanel.style.display = 'block';
+        lobbyRoomIdSpan.innerText = roomId;
+        participantStatusSpan.innerText = host ? 'Ожидание подключения участника...' : 'Подключение к комнате...';
+        chatMessagesDiv.innerHTML = '';
+        chatInput.disabled = true;
+        sendChatBtn.disabled = true;
         fileZone.style.display = 'none';
-        receivedContainer.innerHTML = '';
-        updateSignal(false);
-    }
+        receivedFilesList.innerHTML = '';
 
-    function appendReceivedFile(fileName, fileBlob) {
-        const url = URL.createObjectURL(fileBlob);
-        const sizeMB = (fileBlob.size / (1024 * 1024)).toFixed(2);
-        const row = document.createElement('div');
-        row.className = 'file-row';
-        row.innerHTML = `<span>📄 ${fileName} (${sizeMB} MB)</span><a href="${url}" download="${fileName}">⬇️ скачать</a>`;
-        receivedContainer.prepend(row);
-        setStatus(`✅ получен: ${fileName}`);
-    }
+        socket.off('user-joined');
+        socket.off('user-left');
+        socket.off('room-message');
+        socket.off('webrtc-offer');
+        socket.off('webrtc-answer');
+        socket.off('webrtc-candidate');
+        socket.off('file-transfer');
 
-    function createPeerConnection(isInitiator, targetRoomId) {
-        const pc = new RTCPeerConnection({
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]
+        socket.on('user-joined', (data) => {
+            if (data.roomId === currentRoomId) {
+                participantStatusSpan.innerText = 'Участник подключился! Устанавливаем соединение...';
+                if (isHost) {
+                    initWebRTC(true);
+                }
+            }
         });
-        if (isInitiator) {
-            dataChannel = pc.createDataChannel('lobedron-transfer');
-            dataChannel.onopen = () => { isConnected = true; setStatus('✅ data channel открыт'); fileZone.style.display = 'block'; updateSignal(true); };
-            dataChannel.onclose = () => { isConnected = false; fileZone.style.display = 'none'; setStatus('🔌 data channel закрыт'); updateSignal(false); };
-            dataChannel.onmessage = (e) => {
-                try {
-                    const msg = JSON.parse(e.data);
-                    if (msg.fileName && msg.fileData) {
-                        const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
-                        appendReceivedFile(msg.fileName, new Blob([bytes]));
-                    }
-                } catch(err) {}
-            };
-        } else {
-            pc.ondatachannel = (ev) => {
-                dataChannel = ev.channel;
-                dataChannel.onopen = () => { isConnected = true; setStatus('✅ data channel открыт'); fileZone.style.display = 'block'; updateSignal(true); };
-                dataChannel.onclose = () => { isConnected = false; fileZone.style.display = 'none'; setStatus('🔌 data channel закрыт'); updateSignal(false); };
-                dataChannel.onmessage = (e) => {
-                    try {
-                        const msg = JSON.parse(e.data);
-                        if (msg.fileName && msg.fileData) {
-                            const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
-                            appendReceivedFile(msg.fileName, new Blob([bytes]));
-                        }
-                    } catch(err) {}
-                };
-            };
-        }
-        pc.onicecandidate = (ev) => { if (ev.candidate) socket.emit('ice-candidate', { to: targetRoomId, candidate: ev.candidate }); };
-        pc.onconnectionstatechange = () => {
-            if (pc.connectionState === 'connected') { isConnected = true; updateSignal(true); setStatus('🔗 соединение установлено'); fileZone.style.display = 'block'; }
-            else if (pc.connectionState === 'failed' || pc.connectionState === 'closed') { clearTransferUI(); setStatus('❌ соединение потеряно'); updateSignal(false); }
-        };
-        return pc;
-    }
 
-    function leaveRoom() {
-        if (currentRoomId) socket.emit('leave-room', { roomId: currentRoomId });
-        clearTransferUI();
-        currentRoomId = null;
-    }
-
-    function animatePanelClose(panelElement, callback) {
-        if (!panelElement) { if(callback) callback(); return; }
-        panelElement.classList.add('panel-closing');
-        setTimeout(() => {
-            panelElement.style.display = 'none';
-            panelElement.classList.remove('panel-closing');
-            if(callback) callback();
-        }, 250);
-    }
-
-    function resetToMainMenu() {
-        // если есть открытая панель, анимируем закрытие
-        const activePanel = document.querySelector('.action-panel');
-        if (activePanel) {
-            animatePanelClose(activePanel, () => {
-                dynamicArea.innerHTML = '';
-                showCreate.style.display = 'inline-block';
-                showJoin.style.display = 'inline-block';
+        socket.on('user-left', (data) => {
+            if (data.roomId === currentRoomId) {
+                participantStatusSpan.innerText = 'Участник отключился. Ожидание...';
+                if (peerConnection) peerConnection.close();
+                peerConnection = null;
+                dataChannel = null;
+                isConnected = false;
                 fileZone.style.display = 'none';
-                receivedContainer.innerHTML = '';
-                setStatus('');
-                leaveRoom();
-            });
-        } else {
-            dynamicArea.innerHTML = '';
-            showCreate.style.display = 'inline-block';
-            showJoin.style.display = 'inline-block';
-            fileZone.style.display = 'none';
-            receivedContainer.innerHTML = '';
-            setStatus('');
-            leaveRoom();
+                chatInput.disabled = true;
+                sendChatBtn.disabled = true;
+            }
+        });
+
+        socket.on('room-message', (data) => {
+            if (data.roomId === currentRoomId) {
+                addChatMessage(data.sender, data.text);
+            }
+        });
+
+        socket.on('webrtc-offer', async (data) => {
+            if (data.roomId === currentRoomId && !isHost) {
+                await handleOffer(data.offer);
+            }
+        });
+
+        socket.on('webrtc-answer', async (data) => {
+            if (data.roomId === currentRoomId && isHost && peerConnection) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            }
+        });
+
+        socket.on('webrtc-candidate', async (data) => {
+            if (data.roomId === currentRoomId && peerConnection) {
+                try {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                } catch(e) {}
+            }
+        });
+
+        socket.on('file-transfer', async (data) => {
+            if (data.roomId === currentRoomId && data.fileData && data.fileName) {
+                const bytes = Uint8Array.from(atob(data.fileData), c => c.charCodeAt(0));
+                const blob = new Blob([bytes]);
+                const url = URL.createObjectURL(blob);
+                const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+                const row = document.createElement('div');
+                row.className = 'file-row';
+                row.innerHTML = `<span>📄 ${data.fileName} (${sizeMB} MB)</span><a href="${url}" download="${data.fileName}">⬇️ скачать</a>`;
+                receivedFilesList.prepend(row);
+                setStatus(`✅ получен файл: ${data.fileName}`);
+            }
+        });
+
+        if (!host) {
+            socket.emit('request-webrtc', { roomId: currentRoomId });
         }
     }
 
-    function showCreatePanel() {
-        const existing = document.querySelector('.action-panel');
-        if (existing) {
-            animatePanelClose(existing, () => {
-                dynamicArea.innerHTML = createPanelHtml;
-                showCreate.style.display = 'none';
-                showJoin.style.display = 'none';
-                attachCreateEvents();
-                updateSignal(false);
-            });
-        } else {
-            dynamicArea.innerHTML = createPanelHtml;
-            showCreate.style.display = 'none';
-            showJoin.style.display = 'none';
-            attachCreateEvents();
-            updateSignal(false);
-        }
-    }
-
-    function attachCreateEvents() {
-        const createRoomBtn = document.getElementById('createRoomBtn');
-        const backBtn = document.getElementById('backFromCreate');
-        const myRoomInput = document.getElementById('myRoomName');
-        createRoomBtn.onclick = () => {
-            const rid = myRoomInput.value.trim();
-            if (!rid.match(/^[a-zA-Z0-9_.\-]{3,20}$/)) { setStatus('❌ ID: 3-20 символов (буквы, цифры, _ . -)', true); return; }
-            leaveRoom();
-            currentRoomId = rid;
-            socket.emit('create-room', { roomId: currentRoomId });
+    async function initWebRTC(isInitiator) {
+        const configuration = {
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]
         };
-        backBtn.onclick = () => resetToMainMenu();
-    }
+        peerConnection = new RTCPeerConnection(configuration);
 
-    function showJoinPanel() {
-        const existing = document.querySelector('.action-panel');
-        if (existing) {
-            animatePanelClose(existing, () => {
-                dynamicArea.innerHTML = joinPanelHtml;
-                showCreate.style.display = 'none';
-                showJoin.style.display = 'none';
-                attachJoinEvents();
-                updateSignal(false);
-            });
+        if (isInitiator) {
+            dataChannel = peerConnection.createDataChannel('lobedron-channel');
+            setupDataChannel();
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            socket.emit('webrtc-offer', { roomId: currentRoomId, offer });
         } else {
-            dynamicArea.innerHTML = joinPanelHtml;
-            showCreate.style.display = 'none';
-            showJoin.style.display = 'none';
-            attachJoinEvents();
-            updateSignal(false);
+            peerConnection.ondatachannel = (event) => {
+                dataChannel = event.channel;
+                setupDataChannel();
+            };
         }
-    }
 
-    function attachJoinEvents() {
-        const joinRoomBtn = document.getElementById('joinRoomBtn');
-        const backBtn = document.getElementById('backFromJoin');
-        const joinRoomInput = document.getElementById('joinRoomName');
-        joinRoomBtn.onclick = () => {
-            const rid = joinRoomInput.value.trim();
-            if (!rid) { setStatus('❌ введи ID комнаты', true); return; }
-            leaveRoom();
-            currentRoomId = rid;
-            socket.emit('join-room', { roomId: currentRoomId });
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket.emit('webrtc-candidate', { roomId: currentRoomId, candidate: event.candidate });
+            }
         };
-        backBtn.onclick = () => resetToMainMenu();
+
+        peerConnection.onconnectionstatechange = () => {
+            if (peerConnection.connectionState === 'connected') {
+                isConnected = true;
+                participantStatusSpan.innerText = 'Соединение установлено!';
+                chatInput.disabled = false;
+                sendChatBtn.disabled = false;
+                fileZone.style.display = 'block';
+                setStatus('🔗 соединение активно');
+            } else if (peerConnection.connectionState === 'failed') {
+                isConnected = false;
+                participantStatusSpan.innerText = 'Ошибка соединения';
+                setStatus('❌ соединение не удалось', true);
+            }
+        };
     }
 
-    socket.on('connect', () => setStatus('✅ сервер готов'));
-    socket.on('offer', async ({ from, offer }) => {
-        if (!currentRoomId || from !== currentRoomId || peerConnection) return;
-        peerConnection = createPeerConnection(false, currentRoomId);
+    async function handleOffer(offer) {
+        if (!peerConnection) {
+            await initWebRTC(false);
+        }
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
-        socket.emit('answer', { to: currentRoomId, answer });
-    });
-    socket.on('answer', async ({ answer }) => {
-        if (peerConnection && peerConnection.signalingState !== 'closed')
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-    });
-    socket.on('ice-candidate', async ({ candidate }) => {
-        if (peerConnection && candidate) try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
-    });
-    socket.on('room-created', ({ roomId }) => {
-        if (roomId === currentRoomId) setStatus(`✅ комната "${roomId}" создана, ждём друга...`);
-    });
-    socket.on('room-join-success', ({ roomId }) => {
-        if (roomId === currentRoomId) {
-            setStatus(`🔗 вошёл в "${roomId}", соединяемся...`);
-            if (!peerConnection) {
-                peerConnection = createPeerConnection(true, currentRoomId);
-                peerConnection.createOffer().then(offer => peerConnection.setLocalDescription(offer))
-                    .then(() => socket.emit('offer', { to: currentRoomId, offer: peerConnection.localDescription }));
-            }
-        }
-    });
-    socket.on('room-error', ({ message }) => setStatus(`⚠️ ${message}`, true));
+        socket.emit('webrtc-answer', { roomId: currentRoomId, answer });
+    }
 
-    sendBtn.onclick = () => {
-        if (!fileInput.files.length) { setStatus('⚠️ выбери файл', true); return; }
-        if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') { setStatus('❌ нет активного соединения', true); return; }
-        const file = fileInput.files[0];
+    function setupDataChannel() {
+        if (!dataChannel) return;
+        dataChannel.onopen = () => {
+            isConnected = true;
+            participantStatusSpan.innerText = 'Соединение установлено!';
+            chatInput.disabled = false;
+            sendChatBtn.disabled = false;
+            fileZone.style.display = 'block';
+        };
+        dataChannel.onclose = () => {
+            isConnected = false;
+            chatInput.disabled = true;
+            sendChatBtn.disabled = true;
+            fileZone.style.display = 'none';
+        };
+        dataChannel.onmessage = (event) => {
+            try {
+                const msg = JSON.parse(event.data);
+                if (msg.type === 'chat') {
+                    addChatMessage('собеседник', msg.text);
+                } else if (msg.type === 'file') {
+                    const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
+                    const blob = new Blob([bytes]);
+                    const url = URL.createObjectURL(blob);
+                    const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+                    const row = document.createElement('div');
+                    row.className = 'file-row';
+                    row.innerHTML = `<span>📄 ${msg.fileName} (${sizeMB} MB)</span><a href="${url}" download="${msg.fileName}">⬇️ скачать</a>`;
+                    receivedFilesList.prepend(row);
+                    setStatus(`✅ получен файл: ${msg.fileName}`);
+                }
+            } catch(e) {}
+        };
+    }
+
+    function addChatMessage(sender, text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message';
+        if (sender === 'вы') msgDiv.classList.add('own');
+        msgDiv.innerText = `${sender}: ${text}`;
+        chatMessagesDiv.appendChild(msgDiv);
+        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+    }
+
+    function sendChatMessage(text) {
+        if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') {
+            setStatus('❌ нет соединения для чата', true);
+            return;
+        }
+        dataChannel.send(JSON.stringify({ type: 'chat', text }));
+        addChatMessage('вы', text);
+    }
+
+    function sendFile(file) {
+        if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') {
+            setStatus('❌ нет активного соединения', true);
+            return;
+        }
         setStatus(`📤 отправка ${file.name}...`);
         const reader = new FileReader();
         reader.onload = () => {
             const base64 = reader.result.split(',')[1];
-            dataChannel.send(JSON.stringify({ fileName: file.name, fileData: base64 }));
+            dataChannel.send(JSON.stringify({ type: 'file', fileName: file.name, fileData: base64 }));
             setStatus(`✅ файл отправлен`);
             fileInput.value = '';
         };
         reader.readAsDataURL(file);
-    };
+    }
 
-    showCreate.onclick = showCreatePanel;
-    showJoin.onclick = showJoinPanel;
-    window.addEventListener('beforeunload', () => { if (currentRoomId) socket.emit('leave-room', { roomId: currentRoomId }); });
-
-    resetToMainMenu();
-    updateSignal(false);
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>LOBEDRON SHARE</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+    function leaveLobby() {
+        if (socket && currentRoomId) {
+            socket.emit('leave-room', { roomId: currentRoomId });
         }
+        if (peerConnection) peerConnection.close();
+        peerConnection = null;
+        dataChannel = null;
+        isConnected = false;
+        isInLobby = false;
+        currentRoomId = null;
+        startPanel.style.display = 'block';
+        lobbyPanel.style.display = 'none';
+        setStatus('');
+    }
 
-        body {
-            background: #0a0c10;
-            font-family: 'Segoe UI', 'Manrope', system-ui, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .glass {
-            background: rgba(18, 20, 24, 0.95);
-            backdrop-filter: blur(8px);
-            border-radius: 36px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.6);
-            width: 100%;
-            max-width: 650px;
-            padding: 28px 28px 32px;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #eef2ff 0%, #b9c3e0 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        /* верхняя панель: только кнопки по краям */
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            gap: 24px;
-        }
-
-        .action-btn {
-            background: #171b24;
-            border: 1px solid #2c3140;
-            padding: 12px 28px;
-            border-radius: 48px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #eef2ff;
-            cursor: pointer;
-            transition: 0.2s;
-            min-width: 160px;
-            text-align: center;
-        }
-
-        .action-btn:hover {
-            background: #222834;
-            border-color: #5f6c8f;
-            transform: translateY(-1px);
-        }
-
-        /* индикатор сигнала (полоски) - центрирован внутри панели */
-        .signal {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            margin: 0 auto 16px auto;
-            width: fit-content;
-        }
-
-        .signal-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 5px;
-            height: 22px;
-        }
-
-        .bar {
-            width: 5px;
-            background: #5f6c8f;
-            transition: 0.2s;
-            border-radius: 2px;
-        }
-
-        .bar1 { height: 6px; }
-        .bar2 { height: 10px; }
-        .bar3 { height: 14px; }
-
-        .bar.active {
-            background: #eef2ff;
-        }
-
-        .signal-cross {
-            font-size: 13px;
-            color: #eef2ff;
-            display: none;
-        }
-
-        .signal.disconnected .bar {
-            background: #5f6c8f;
-            opacity: 0.5;
-        }
-        .signal.disconnected .signal-cross {
-            display: inline-block;
-        }
-
-        /* панели действий */
-        .action-panel {
-            display: none;
-            animation: fadeIn 0.2s ease;
-            margin: 20px 0;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            font-size: 0.7rem;
-            color: #8b8f9c;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        input {
-            width: 100%;
-            background: #0c0f16;
-            border: 1px solid #282e3a;
-            padding: 12px 16px;
-            border-radius: 32px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        input:focus {
-            border-color: #5f6c8f;
-        }
-
-        button {
-            width: 100%;
-            background: #171b24;
-            border: 1px solid #2c3140;
-            padding: 10px 18px;
-            border-radius: 40px;
-            font-weight: 600;
-            color: #eef2ff;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-bottom: 10px;
-        }
-
-        button:hover {
-            background: #222834;
-            border-color: #5f6c8f;
-        }
-
-        .back-btn {
-            background: #0f1119;
-            margin-top: 4px;
-        }
-
-        .file-panel {
-            margin-top: 24px;
-            border-top: 1px solid #20232e;
-            padding-top: 20px;
-        }
-
-        .file-row {
-            background: #0f1119;
-            border-radius: 20px;
-            padding: 12px 16px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #232632;
-        }
-
-        .file-row a {
-            color: #98abee;
-            text-decoration: none;
-            background: #1e2432;
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-        }
-
-        .status-text {
-            font-size: 0.7rem;
-            color: #8b8f9c;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-</head>
-<body>
-<div class="glass">
-    <h1>⚡ LOBESHARE</h1>
-
-    <div class="top-bar">
-        <button id="showCreateBtn" class="action-btn">📎 СОЗДАТЬ</button>
-        <button id="showJoinBtn" class="action-btn">🔗 ПОДКЛЮЧИТЬСЯ</button>
-    </div>
-
-    <div id="dynamicArea"></div>
-
-    <div id="fileTransferZone" style="display: none;" class="file-panel fade">
-        <div class="input-group">
-            <label>📁 ВЫБРАТЬ ФАЙЛ</label>
-            <input type="file" id="fileInput">
-        </div>
-        <button id="sendFileBtn">📤 ОТПРАВИТЬ ФАЙЛ</button>
-        <div style="margin: 16px 0 8px; font-weight: 500;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
-        <div id="receivedFilesList"></div>
-    </div>
-
-    <div id="statusMessage" class="status-text"></div>
-</div>
-
-<script>
-    const SIGNALING_SERVER = 'https://webrtc-signal-server-2.onrender.com';
-    const socket = io(SIGNALING_SERVER, { transports: ['websocket', 'polling'] });
-
-    let currentRoomId = null;
-    let peerConnection = null;
-    let dataChannel = null;
-    let isConnected = false;
-
-    const showCreate = document.getElementById('showCreateBtn');
-    const showJoin = document.getElementById('showJoinBtn');
-    const dynamicArea = document.getElementById('dynamicArea');
-    const fileZone = document.getElementById('fileTransferZone');
-    const fileInput = document.getElementById('fileInput');
-    const sendBtn = document.getElementById('sendFileBtn');
-    const receivedContainer = document.getElementById('receivedFilesList');
-    const statusMsg = document.getElementById('statusMessage');
-
-    // Шаблоны панелей с индикатором внутри
     const createPanelHtml = `
         <div id="createPanel" class="action-panel" style="display: block;">
-            <div id="signalCreate" class="signal disconnected">
-                <div class="signal-bars">
-                    <div class="bar bar1"></div>
-                    <div class="bar bar2"></div>
-                    <div class="bar bar3"></div>
-                </div>
-                <span class="signal-cross">✕</span>
-            </div>
             <div class="input-group">
                 <label>ID комнаты</label>
-                <input type="text" id="myRoomName" align="center" placeholder="ID" maxlength="20">
+                <input type="text" id="myRoomName" maxlength="20">
             </div>
-            <button id="createRoomBtn">СОЗДАТЬ КОМНАТУ</button>
+            <button id="createRoomBtn">✨ СОЗДАТЬ КОМНАТУ</button>
             <button id="backFromCreate" class="back-btn">← НАЗАД</button>
         </div>
     `;
     const joinPanelHtml = `
         <div id="joinPanel" class="action-panel" style="display: block;">
-            <div id="signalJoin" class="signal disconnected">
-                <div class="signal-bars">
-                    <div class="bar bar1"></div>
-                    <div class="bar bar2"></div>
-                    <div class="bar bar3"></div>
-                </div>
-                <span class="signal-cross">✕</span>
-            </div>
             <div class="input-group">
                 <label>ID комнаты</label>
-                <input type="text" id="joinRoomName" placeholder="ID">
+                <input type="text" id="joinRoomName" maxlength="20">
             </div>
             <button id="joinRoomBtn">🔗 ПОДКЛЮЧИТЬСЯ</button>
             <button id="backFromJoin" class="back-btn">← НАЗАД</button>
         </div>
     `;
 
-    function setStatus(text, isError = false) {
-        statusMsg.innerHTML = text;
-        if (isError) setTimeout(() => { if (statusMsg.innerHTML === text) statusMsg.innerHTML = ''; }, 3000);
-    }
-
-    function updateSignal(connected) {
-        // обновляем оба индикатора (если они есть на странице)
-        const signals = document.querySelectorAll('.signal');
-        signals.forEach(sig => {
-            if (connected) sig.classList.remove('disconnected');
-            else sig.classList.add('disconnected');
-        });
-    }
-
-    function clearTransferUI() {
-        if (dataChannel) try { dataChannel.close(); } catch(e) {}
-        if (peerConnection) try { peerConnection.close(); } catch(e) {}
-        dataChannel = null;
-        peerConnection = null;
-        isConnected = false;
-        fileZone.style.display = 'none';
-        receivedContainer.innerHTML = '';
-        updateSignal(false);
-    }
-
-    function appendReceivedFile(fileName, fileBlob) {
-        const url = URL.createObjectURL(fileBlob);
-        const sizeMB = (fileBlob.size / (1024 * 1024)).toFixed(2);
-        const row = document.createElement('div');
-        row.className = 'file-row fade';
-        row.innerHTML = `<span>📄 ${fileName} (${sizeMB} MB)</span><a href="${url}" download="${fileName}">⬇️ скачать</a>`;
-        receivedContainer.prepend(row);
-        setStatus(`✅ получен: ${fileName}`);
-    }
-
-    function createPeerConnection(isInitiator, targetRoomId) {
-        const pc = new RTCPeerConnection({
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]
-        });
-
-        if (isInitiator) {
-            dataChannel = pc.createDataChannel('lobedron-transfer');
-            dataChannel.onopen = () => { isConnected = true; setStatus('✅ data channel открыт'); fileZone.style.display = 'block'; updateSignal(true); };
-            dataChannel.onclose = () => { isConnected = false; fileZone.style.display = 'none'; setStatus('🔌 data channel закрыт'); updateSignal(false); };
-            dataChannel.onmessage = (e) => {
-                try {
-                    const msg = JSON.parse(e.data);
-                    if (msg.fileName && msg.fileData) {
-                        const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
-                        appendReceivedFile(msg.fileName, new Blob([bytes]));
-                    }
-                } catch(err) {}
-            };
-        } else {
-            pc.ondatachannel = (ev) => {
-                dataChannel = ev.channel;
-                dataChannel.onopen = () => { isConnected = true; setStatus('✅ data channel открыт'); fileZone.style.display = 'block'; updateSignal(true); };
-                dataChannel.onclose = () => { isConnected = false; fileZone.style.display = 'none'; setStatus('🔌 data channel закрыт'); updateSignal(false); };
-                dataChannel.onmessage = (e) => {
-                    try {
-                        const msg = JSON.parse(e.data);
-                        if (msg.fileName && msg.fileData) {
-                            const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
-                            appendReceivedFile(msg.fileName, new Blob([bytes]));
-                        }
-                    } catch(err) {}
-                };
-            };
-        }
-
-        pc.onicecandidate = (ev) => { if (ev.candidate) socket.emit('ice-candidate', { to: targetRoomId, candidate: ev.candidate }); };
-        pc.onconnectionstatechange = () => {
-            if (pc.connectionState === 'connected') { isConnected = true; updateSignal(true); setStatus('🔗 соединение установлено'); fileZone.style.display = 'block'; }
-            else if (pc.connectionState === 'failed' || pc.connectionState === 'closed') { clearTransferUI(); setStatus('❌ соединение потеряно'); updateSignal(false); }
-        };
-        return pc;
-    }
-
-    function leaveRoom() {
-        if (currentRoomId) socket.emit('leave-room', { roomId: currentRoomId });
-        clearTransferUI();
-        currentRoomId = null;
-    }
-
-    function resetToMainMenu() {
-        dynamicArea.innerHTML = '';
-        showCreate.style.display = 'inline-block';
-        showJoin.style.display = 'inline-block';
-        fileZone.style.display = 'none';
-        receivedContainer.innerHTML = '';
-        setStatus('');
-        leaveRoom();
-    }
-
     function showCreatePanel() {
         dynamicArea.innerHTML = createPanelHtml;
-        showCreate.style.display = 'none';
-        showJoin.style.display = 'none';
-        const createRoomBtn = document.getElementById('createRoomBtn');
+        const createBtn = document.getElementById('createRoomBtn');
         const backBtn = document.getElementById('backFromCreate');
-        const myRoomInput = document.getElementById('myRoomName');
-        createRoomBtn.onclick = () => {
-            const rid = myRoomInput.value.trim();
-            if (!rid.match(/^[a-zA-Z0-9_.\-]{3,20}$/)) { setStatus('❌ ID: 3-20 символов (буквы, цифры, _ . -)', true); return; }
-            leaveRoom();
-            currentRoomId = rid;
-            socket.emit('create-room', { roomId: currentRoomId });
+        const roomInput = document.getElementById('myRoomName');
+        createBtn.onclick = () => {
+            const rid = roomInput.value.trim();
+            if (!rid) {
+                showError('Введите ID комнаты');
+                return;
+            }
+            if (rid.length > 20) {
+                showError('ID не может быть длиннее 20 символов');
+                return;
+            }
+            connectToSignaling((ok) => {
+                if (ok) createRoom(rid);
+            });
         };
-        backBtn.onclick = () => { resetToMainMenu(); };
-        // обновляем индикатор на начальное состояние (отключён)
-        updateSignal(false);
+        backBtn.onclick = () => {
+            dynamicArea.innerHTML = '';
+        };
     }
 
     function showJoinPanel() {
         dynamicArea.innerHTML = joinPanelHtml;
-        showCreate.style.display = 'none';
-        showJoin.style.display = 'none';
-        const joinRoomBtn = document.getElementById('joinRoomBtn');
+        const joinBtn = document.getElementById('joinRoomBtn');
         const backBtn = document.getElementById('backFromJoin');
-        const joinRoomInput = document.getElementById('joinRoomName');
-        joinRoomBtn.onclick = () => {
-            const rid = joinRoomInput.value.trim();
-            if (!rid) { setStatus('❌ введи ID комнаты', true); return; }
-            leaveRoom();
-            currentRoomId = rid;
-            socket.emit('join-room', { roomId: currentRoomId });
+        const roomInput = document.getElementById('joinRoomName');
+        joinBtn.onclick = () => {
+            const rid = roomInput.value.trim();
+            if (!rid) {
+                showError('Введите ID комнаты');
+                return;
+            }
+            if (rid.length > 20) {
+                showError('ID не может быть длиннее 20 символов');
+                return;
+            }
+            connectToSignaling((ok) => {
+                if (ok) joinRoom(rid);
+            });
         };
-        backBtn.onclick = () => { resetToMainMenu(); };
-        updateSignal(false);
+        backBtn.onclick = () => {
+            dynamicArea.innerHTML = '';
+        };
     }
 
-    socket.on('connect', () => setStatus('✅ сервер готов'));
-    socket.on('offer', async ({ from, offer }) => {
-        if (!currentRoomId || from !== currentRoomId || peerConnection) return;
-        peerConnection = createPeerConnection(false, currentRoomId);
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-        socket.emit('answer', { to: currentRoomId, answer });
-    });
-    socket.on('answer', async ({ answer }) => {
-        if (peerConnection && peerConnection.signalingState !== 'closed')
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-    });
-    socket.on('ice-candidate', async ({ candidate }) => {
-        if (peerConnection && candidate) try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
-    });
-    socket.on('room-created', ({ roomId }) => {
-        if (roomId === currentRoomId) setStatus(`✅ комната "${roomId}" создана, ждём друга...`);
-    });
-    socket.on('room-join-success', ({ roomId }) => {
-        if (roomId === currentRoomId) {
-            setStatus(`🔗 вошёл в "${roomId}", соединяемся...`);
-            if (!peerConnection) {
-                peerConnection = createPeerConnection(true, currentRoomId);
-                peerConnection.createOffer().then(offer => peerConnection.setLocalDescription(offer))
-                    .then(() => socket.emit('offer', { to: currentRoomId, offer: peerConnection.localDescription }));
-            }
+    showCreateBtn.onclick = showCreatePanel;
+    showJoinBtn.onclick = showJoinPanel;
+    leaveLobbyBtn.onclick = leaveLobby;
+    sendChatBtn.onclick = () => {
+        const text = chatInput.value.trim();
+        if (text) {
+            sendChatMessage(text);
+            chatInput.value = '';
+        }
+    };
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && chatInput.value.trim()) {
+            sendChatMessage(chatInput.value.trim());
+            chatInput.value = '';
         }
     });
-    socket.on('room-error', ({ message }) => setStatus(`⚠️ ${message}`, true));
-
-    sendBtn.onclick = () => {
-        if (!fileInput.files.length) { setStatus('⚠️ выбери файл', true); return; }
-        if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') { setStatus('❌ нет активного соединения', true); return; }
-        const file = fileInput.files[0];
-        setStatus(`📤 отправка ${file.name}...`);
-        const reader = new FileReader();
-        reader.onload = () => {
-            const base64 = reader.result.split(',')[1];
-            dataChannel.send(JSON.stringify({ fileName: file.name, fileData: base64 }));
-            setStatus(`✅ файл отправлен`);
-            fileInput.value = '';
-        };
-        reader.readAsDataURL(file);
+    sendFileBtn.onclick = () => {
+        if (fileInput.files.length) sendFile(fileInput.files[0]);
+        else setStatus('⚠️ выбери файл', true);
     };
 
-    showCreate.onclick = showCreatePanel;
-    showJoin.onclick = showJoinPanel;
-    window.addEventListener('beforeunload', () => { if (currentRoomId) socket.emit('leave-room', { roomId: currentRoomId }); });
-
-    // Инициализация
-    resetToMainMenu();
-    updateSignal(false);
+    startPanel.style.display = 'block';
+    lobbyPanel.style.display = 'none';
 </script>
 </body>
 </html>
