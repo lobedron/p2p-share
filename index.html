@@ -3,142 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>P2P Обмен файлами</title>
+    <title>LOBEDRON | Обмен файлами</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            background: #050505;
-            color: #efefef;
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0f1e 0%, #0a0a14 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             padding: 20px;
         }
         .container {
-            background: #111;
-            border: 1px solid #222;
+            background: rgba(18, 22, 35, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 32px;
-            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 32px;
             width: 100%;
-            max-width: 560px;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+            max-width: 600px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-        h1 { font-size: 1.7rem; margin-bottom: 24px; text-align: center; }
-        .my-id {
-            background: #0a0a0a;
-            padding: 14px;
-            border-radius: 20px;
-            word-break: break-all;
-            font-family: monospace;
-            margin-bottom: 24px;
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a0a0ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             text-align: center;
-            border: 1px solid #2a2a2a;
+            margin-bottom: 8px;
         }
-        .my-id small { font-size: 0.7rem; color: #888; display: block; margin-bottom: 6px; }
-        .peer-id-input {
-            width: 100%;
-            padding: 12px 16px;
-            background: #0a0a0a;
-            border: 1px solid #2a2a2a;
-            color: white;
-            border-radius: 40px;
-            margin-bottom: 12px;
+        .sub {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 32px;
+            font-size: 0.85rem;
+        }
+        .id-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 24px;
+        }
+        .id-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        #myId {
+            font-family: monospace;
             font-size: 0.9rem;
+            word-break: break-all;
+            background: #0a0e16;
+            padding: 12px;
+            border-radius: 12px;
+            color: #4ade80;
+        }
+        .input-group {
+            margin-bottom: 16px;
+        }
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            background: #0a0e16;
+            border: 1px solid #1f2937;
+            border-radius: 24px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus {
+            border-color: #4ade80;
         }
         button {
-            background: #222;
-            border: none;
-            color: white;
-            padding: 10px 20px;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
             border-radius: 40px;
+            color: white;
             font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
-            width: 100%;
+            margin-bottom: 16px;
         }
-        button:hover { background: #333; }
-        .file-area { margin-top: 20px; border-top: 1px solid #222; padding-top: 20px; }
+        button:hover {
+            border-color: #4ade80;
+            background: #1f2937;
+            transform: translateY(-1px);
+        }
+        .file-area {
+            border-top: 1px solid #1f2937;
+            padding-top: 24px;
+            margin-top: 8px;
+        }
         .status {
-            margin-top: 20px;
-            padding: 12px;
-            background: #0a0a0a;
-            border-radius: 20px;
-            border: 1px solid #222;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        .received-files { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
-        .file-card {
-            background: #1a1a1a;
-            padding: 12px;
+            background: #0a0e16;
             border-radius: 16px;
-            border: 1px solid #2a2a2a;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            margin: 16px 0;
         }
-        .file-card a { color: #4ade80; text-decoration: none; font-size: 0.8rem; margin-left: 12px; }
-        hr { border-color: #222; margin: 20px 0; }
+        .received-file {
+            background: #0a0e16;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .received-file a {
+            color: #4ade80;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #4b5563;
+            margin-top: 24px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>📁 P2P Обмен файлами</h1>
-    <div class="my-id">
-        <small>🔑 ВАШ ID (скопируйте и отправьте другу)</small>
-        <div id="myPeerId">Подключение...</div>
+    <h1>⚡ LOBEDRON SHARE</h1>
+    <div class="sub">Прямая передача файлов — без серверов</div>
+
+    <div class="id-card">
+        <div class="id-label">🔑 ТВОЙ ID ДЛЯ ПОДКЛЮЧЕНИЯ</div>
+        <div id="myId">Загрузка...</div>
     </div>
-    <hr>
-    <div>
-        <div style="font-weight: 600; margin-bottom: 8px;">🔌 ПОДКЛЮЧИТЬСЯ К ДРУГУ</div>
-        <input type="text" id="peerIdInput" class="peer-id-input" placeholder="Введите ID друга">
-        <button id="connectBtn">Подключиться</button>
+
+    <div class="input-group">
+        <input type="text" id="peerIdInput" placeholder="Вставь ID друга">
     </div>
+    <button id="connectBtn">🔗 ПОДКЛЮЧИТЬСЯ</button>
+
     <div id="transferBlock" style="display: none;">
         <div class="file-area">
-            <div style="font-weight: 600; margin-bottom: 8px;">📤 ОТПРАВИТЬ ФАЙЛ</div>
-            <input type="file" id="fileInput" style="margin-bottom: 12px; width: 100%;">
-            <button id="sendFileBtn">Отправить</button>
-            <div style="font-weight: 600; margin: 16px 0 8px;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
-            <div id="receivedFiles" class="received-files"></div>
+            <input type="file" id="fileInput" style="margin-bottom: 16px;">
+            <button id="sendBtn">📤 ОТПРАВИТЬ ФАЙЛ</button>
+            <div style="margin: 20px 0 10px; font-weight: 600;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
+            <div id="receivedList"></div>
         </div>
     </div>
+
     <div id="status" class="status">🟢 Ожидание подключения...</div>
+    <footer>LOBEDRON P2P — файлы идут напрямую, никто не видит</footer>
 </div>
+
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-    // Пробуем альтернативный публичный сервер (herokuapp)
+    // Публичный сервер PeerJS (бесплатный, не требует настройки)
     const peer = new Peer({
-        host: 'peerjs-server.herokuapp.com',
+        host: '0.peerjs.com',
         port: 443,
         path: '/',
         secure: true
     });
-    
+
     let currentConnection = null;
+
     const statusDiv = document.getElementById('status');
-    const myIdDiv = document.getElementById('myPeerId');
-    const transferBlock = document.getElementById('transferBlock');
-    const connectBtn = document.getElementById('connectBtn');
+    const myIdDiv = document.getElementById('myId');
     const peerIdInput = document.getElementById('peerIdInput');
+    const connectBtn = document.getElementById('connectBtn');
+    const transferBlock = document.getElementById('transferBlock');
     const fileInput = document.getElementById('fileInput');
-    const sendFileBtn = document.getElementById('sendFileBtn');
-    const receivedFilesDiv = document.getElementById('receivedFiles');
+    const sendBtn = document.getElementById('sendBtn');
+    const receivedList = document.getElementById('receivedList');
 
     peer.on('open', (id) => {
-        myIdDiv.textContent = id;
-        statusDiv.innerHTML = '✅ Ваш ID готов. Передайте его другу и подключитесь.';
+        myIdDiv.innerText = id;
+        statusDiv.innerHTML = '✅ Готов. Скопируй ID и отправь другу.';
     });
 
     peer.on('connection', (conn) => {
         currentConnection = conn;
         setupConnection(conn);
-        statusDiv.innerHTML = '🔗 Подключено! Можно отправлять файлы.';
+        statusDiv.innerHTML = '🔗 Друг подключился! Можете обмениваться файлами.';
         transferBlock.style.display = 'block';
     });
 
     peer.on('error', (err) => {
         console.error(err);
-        statusDiv.innerHTML = '❌ Ошибка: ' + err.type + '. Попробуйте обновить страницу. Если ошибка повторяется, возможно, сервер временно недоступен.';
+        statusDiv.innerHTML = '❌ Ошибка: ' + err.type + '. Обнови страницу и попробуй ещё раз.';
     });
 
     connectBtn.addEventListener('click', () => {
@@ -153,20 +217,20 @@
 
     function setupConnection(conn) {
         conn.on('open', () => {
-            statusDiv.innerHTML = '✅ Подключено! Выберите файл для отправки.';
+            statusDiv.innerHTML = '✅ Соединение установлено! Выбери файл.';
         });
         conn.on('data', (data) => {
             if (data && data.type === 'file') {
                 const blob = new Blob([data.file], { type: data.fileType });
                 const url = URL.createObjectURL(blob);
                 const fileSizeMB = (data.fileSize / 1024 / 1024).toFixed(2);
-                const fileDiv = document.createElement('div');
-                fileDiv.className = 'file-card';
-                fileDiv.innerHTML = `
-                    <div><strong>📄 ${data.fileName}</strong> <span>(${fileSizeMB} MB)</span></div>
+                const div = document.createElement('div');
+                div.className = 'received-file';
+                div.innerHTML = `
+                    <span>📄 ${data.fileName} (${fileSizeMB} MB)</span>
                     <a href="${url}" download="${data.fileName}">⬇️ Скачать</a>
                 `;
-                receivedFilesDiv.prepend(fileDiv);
+                receivedList.prepend(div);
                 statusDiv.innerHTML = `📥 Получен файл: ${data.fileName}`;
             }
         });
@@ -177,30 +241,29 @@
         });
     }
 
-    sendFileBtn.addEventListener('click', () => {
+    sendBtn.addEventListener('click', () => {
         if (!currentConnection) {
-            statusDiv.innerHTML = '❌ Нет активного подключения.';
+            statusDiv.innerHTML = '❌ Нет подключения. Сначала подключись к другу.';
             return;
         }
         const file = fileInput.files[0];
         if (!file) {
-            statusDiv.innerHTML = '⚠️ Выберите файл сначала.';
+            statusDiv.innerHTML = '⚠️ Выбери файл для отправки.';
             return;
         }
         const reader = new FileReader();
         reader.onload = (e) => {
-            const fileData = e.target.result;
             currentConnection.send({
                 type: 'file',
-                file: fileData,
+                file: e.target.result,
                 fileName: file.name,
                 fileType: file.type,
                 fileSize: file.size
             });
             statusDiv.innerHTML = `📤 Отправка "${file.name}"...`;
             setTimeout(() => {
-                statusDiv.innerHTML = `✅ Файл "${file.name}" отправлен!`;
-            }, 500);
+                statusDiv.innerHTML = `✅ Файл отправлен!`;
+            }, 1000);
         };
         reader.readAsArrayBuffer(file);
     });
