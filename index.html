@@ -10,332 +10,476 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            background: linear-gradient(135deg, #0a0f1e 0%, #0a0a14 100%);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0a0c10;
+            font-family: 'Segoe UI', 'Manrope', system-ui, sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-        .container {
-            background: rgba(18, 22, 35, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 32px;
+
+        .glass {
+            background: rgba(18, 20, 24, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 36px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.6);
             width: 100%;
-            max-width: 600px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 650px;
+            padding: 28px 28px 32px;
         }
+
         h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, #a0a0ff 100%);
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #eef2ff 0%, #b9c3e0 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             text-align: center;
-            margin-bottom: 8px;
-        }
-        .sub {
-            text-align: center;
-            color: #6b7280;
             margin-bottom: 32px;
-            font-size: 0.85rem;
         }
-        .id-card {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+
+        /* верхняя панель: только кнопки по краям */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 24px;
+            gap: 24px;
         }
-        .id-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #6b7280;
-            margin-bottom: 8px;
+
+        .action-btn {
+            background: #171b24;
+            border: 1px solid #2c3140;
+            padding: 12px 28px;
+            border-radius: 48px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #eef2ff;
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 160px;
+            text-align: center;
         }
-        #myId {
-            font-family: monospace;
-            font-size: 0.9rem;
-            word-break: break-all;
-            background: #0a0e16;
-            padding: 12px;
-            border-radius: 12px;
-            color: #4ade80;
+
+        .action-btn:hover {
+            background: #222834;
+            border-color: #5f6c8f;
+            transform: translateY(-1px);
         }
+
+        /* индикатор сигнала (полоски) - центрирован внутри панели */
+        .signal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            margin: 0 auto 16px auto;
+            width: fit-content;
+        }
+
+        .signal-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 5px;
+            height: 22px;
+        }
+
+        .bar {
+            width: 5px;
+            background: #5f6c8f;
+            transition: 0.2s;
+            border-radius: 2px;
+        }
+
+        .bar1 { height: 6px; }
+        .bar2 { height: 10px; }
+        .bar3 { height: 14px; }
+
+        .bar.active {
+            background: #eef2ff;
+        }
+
+        .signal-cross {
+            font-size: 13px;
+            color: #eef2ff;
+            display: none;
+        }
+
+        .signal.disconnected .bar {
+            background: #5f6c8f;
+            opacity: 0.5;
+        }
+        .signal.disconnected .signal-cross {
+            display: inline-block;
+        }
+
+        /* панели действий */
+        .action-panel {
+            display: none;
+            animation: fadeIn 0.2s ease;
+            margin: 20px 0;
+        }
+
         .input-group {
             margin-bottom: 16px;
         }
+
+        label {
+            font-size: 0.7rem;
+            color: #8b8f9c;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
         input {
             width: 100%;
-            padding: 14px 18px;
-            background: #0a0e16;
-            border: 1px solid #1f2937;
-            border-radius: 24px;
+            background: #0c0f16;
+            border: 1px solid #282e3a;
+            padding: 12px 16px;
+            border-radius: 32px;
             color: white;
             font-size: 0.9rem;
             outline: none;
-            transition: 0.2s;
         }
+
         input:focus {
-            border-color: #4ade80;
+            border-color: #5f6c8f;
         }
+
         button {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border: 1px solid #374151;
+            background: #171b24;
+            border: 1px solid #2c3140;
+            padding: 10px 18px;
             border-radius: 40px;
-            color: white;
             font-weight: 600;
+            color: #eef2ff;
             cursor: pointer;
             transition: 0.2s;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
+
         button:hover {
-            border-color: #4ade80;
-            background: #1f2937;
-            transform: translateY(-1px);
+            background: #222834;
+            border-color: #5f6c8f;
         }
-        .file-area {
-            border-top: 1px solid #1f2937;
-            padding-top: 24px;
-            margin-top: 8px;
+
+        .back-btn {
+            background: #0f1119;
+            margin-top: 4px;
         }
-        .status {
-            background: #0a0e16;
-            border-radius: 16px;
-            padding: 12px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #9ca3af;
-            margin: 16px 0;
+
+        .file-panel {
+            margin-top: 24px;
+            border-top: 1px solid #20232e;
+            padding-top: 20px;
         }
-        .received-file {
-            background: #0a0e16;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 8px;
+
+        .file-row {
+            background: #0f1119;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid #232632;
         }
-        .received-file a {
-            color: #4ade80;
+
+        .file-row a {
+            color: #98abee;
             text-decoration: none;
-            font-weight: 500;
+            background: #1e2432;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
         }
-        footer {
-            text-align: center;
+
+        .status-text {
             font-size: 0.7rem;
-            color: #4b5563;
-            margin-top: 24px;
+            color: #8b8f9c;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
 <body>
-<div class="container">
-    <h1>⚡ LOBEDRON SHARE</h1>
-    <div class="sub">Прямая передача файлов — без серверов</div>
+<div class="glass">
+    <h1>⚡ LOBESHARE</h1>
 
-    <div class="id-card">
-        <div class="id-label">🔑 ТВОЙ ID ДЛЯ ПОДКЛЮЧЕНИЯ</div>
-        <div id="myId">Загрузка...</div>
+    <div class="top-bar">
+        <button id="showCreateBtn" class="action-btn">📎 СОЗДАТЬ</button>
+        <button id="showJoinBtn" class="action-btn">🔗 ПОДКЛЮЧИТЬСЯ</button>
     </div>
 
-    <div class="input-group">
-        <input type="text" id="peerIdInput" placeholder="Вставь ID друга">
-    </div>
-    <button id="connectBtn">🔗 ПОДКЛЮЧИТЬСЯ</button>
+    <div id="dynamicArea"></div>
 
-    <div id="transferBlock" style="display: none;">
-        <div class="file-area">
-            <input type="file" id="fileInput" style="margin-bottom: 16px;">
-            <button id="sendBtn">📤 ОТПРАВИТЬ ФАЙЛ</button>
-            <div style="margin: 20px 0 10px; font-weight: 600;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
-            <div id="receivedList"></div>
+    <div id="fileTransferZone" style="display: none;" class="file-panel fade">
+        <div class="input-group">
+            <label>📁 ВЫБРАТЬ ФАЙЛ</label>
+            <input type="file" id="fileInput">
         </div>
+        <button id="sendFileBtn">📤 ОТПРАВИТЬ ФАЙЛ</button>
+        <div style="margin: 16px 0 8px; font-weight: 500;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
+        <div id="receivedFilesList"></div>
     </div>
 
-    <div id="status" class="status">🟢 Ожидание подключения...</div>
-    <footer>LOBEDRON P2P — файлы идут напрямую, никто не видит</footer>
+    <div id="statusMessage" class="status-text"></div>
 </div>
 
-<script type="importmap">
-    {
-        "imports": {
-            "trystero": "https://esm.run/trystero"
-        }
-    }
-</script>
+<script>
+    const SIGNALING_SERVER = 'https://webrtc-signal-server-2.onrender.com';
+    const socket = io(SIGNALING_SERVER, { transports: ['websocket', 'polling'] });
 
-<script type="module">
-    import { joinRoom } from 'trystero';
-    
-    let currentRoom = null;
-    let currentPeerId = null;
-    let sendAction = null;
+    let currentRoomId = null;
+    let peerConnection = null;
+    let dataChannel = null;
+    let isConnected = false;
 
-    const statusDiv = document.getElementById('status');
-    const myIdDiv = document.getElementById('myId');
-    const peerIdInput = document.getElementById('peerIdInput');
-    const connectBtn = document.getElementById('connectBtn');
-    const transferBlock = document.getElementById('transferBlock');
+    const showCreate = document.getElementById('showCreateBtn');
+    const showJoin = document.getElementById('showJoinBtn');
+    const dynamicArea = document.getElementById('dynamicArea');
+    const fileZone = document.getElementById('fileTransferZone');
     const fileInput = document.getElementById('fileInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const receivedList = document.getElementById('receivedList');
+    const sendBtn = document.getElementById('sendFileBtn');
+    const receivedContainer = document.getElementById('receivedFilesList');
+    const statusMsg = document.getElementById('statusMessage');
 
-    // Уникальный идентификатор твоего приложения
-    const APP_ID = 'lobedron-share-v1';
-    const ROOM_ID = 'lobedron-main-room';
+    // Шаблоны панелей с индикатором внутри
+    const createPanelHtml = `
+        <div id="createPanel" class="action-panel" style="display: block;">
+            <div id="signalCreate" class="signal disconnected">
+                <div class="signal-bars">
+                    <div class="bar bar1"></div>
+                    <div class="bar bar2"></div>
+                    <div class="bar bar3"></div>
+                </div>
+                <span class="signal-cross">✕</span>
+            </div>
+            <div class="input-group">
+                <label>ID комнаты</label>
+                <input type="text" id="myRoomName" align="center" placeholder="ID" maxlength="20">
+            </div>
+            <button id="createRoomBtn">СОЗДАТЬ КОМНАТУ</button>
+            <button id="backFromCreate" class="back-btn">← НАЗАД</button>
+        </div>
+    `;
+    const joinPanelHtml = `
+        <div id="joinPanel" class="action-panel" style="display: block;">
+            <div id="signalJoin" class="signal disconnected">
+                <div class="signal-bars">
+                    <div class="bar bar1"></div>
+                    <div class="bar bar2"></div>
+                    <div class="bar bar3"></div>
+                </div>
+                <span class="signal-cross">✕</span>
+            </div>
+            <div class="input-group">
+                <label>ID комнаты</label>
+                <input type="text" id="joinRoomName" placeholder="ID">
+            </div>
+            <button id="joinRoomBtn">🔗 ПОДКЛЮЧИТЬСЯ</button>
+            <button id="backFromJoin" class="back-btn">← НАЗАД</button>
+        </div>
+    `;
 
-    // Функция для генерации короткого ID (для отображения)
-    function generateShortId() {
-        return Math.random().toString(36).substring(2, 10);
+    function setStatus(text, isError = false) {
+        statusMsg.innerHTML = text;
+        if (isError) setTimeout(() => { if (statusMsg.innerHTML === text) statusMsg.innerHTML = ''; }, 3000);
     }
 
-    // Получаем или создаём ID для этого экземпляра
-    let storedPeerId = localStorage.getItem('lobedron_peer_id');
-    if (!storedPeerId) {
-        storedPeerId = generateShortId();
-        localStorage.setItem('lobedron_peer_id', storedPeerId);
-    }
-    currentPeerId = storedPeerId;
-    myIdDiv.innerText = currentPeerId;
-
-    // Функция для подключения к комнате
-    function connectToRoom() {
-        if (currentRoom) {
-            // Если уже есть подключение, отключаемся
-            // (В Trystero нет явного метода disconnect, но мы можем просто пересоздать комнату)
-        }
-        
-        // Создаём/подключаемся к комнате. Стратегия по умолчанию - Nostr.
-        // Альтернативы: 'trystero/torrent', 'trystero/ipfs', 'trystero/mqtt'
-        const room = joinRoom({ appId: APP_ID }, ROOM_ID);
-        
-        // [sendFile, onReceiveFile] = room.makeAction('file-transfer')
-        const [sendFile, onReceiveFile] = room.makeAction('file-transfer');
-        
-        // Обработчик получения файла
-        onReceiveFile(async (data, peerId) => {
-            console.log(`Получен файл от ${peerId}`, data);
-            // data - это объект, который мы отправили: { file: ArrayBuffer, name: string, size: number }
-            if (data && data.file) {
-                const blob = new Blob([data.file]);
-                const url = URL.createObjectURL(blob);
-                const fileSizeMB = (data.size / 1024 / 1024).toFixed(2);
-                const div = document.createElement('div');
-                div.className = 'received-file';
-                div.innerHTML = `
-                    <span>📄 ${data.name} (${fileSizeMB} MB)</span>
-                    <a href="${url}" download="${data.name}">⬇️ Скачать</a>
-                `;
-                receivedList.prepend(div);
-                statusDiv.innerHTML = `📥 Получен файл: ${data.name}`;
-            }
+    function updateSignal(connected) {
+        // обновляем оба индикатора (если они есть на странице)
+        const signals = document.querySelectorAll('.signal');
+        signals.forEach(sig => {
+            if (connected) sig.classList.remove('disconnected');
+            else sig.classList.add('disconnected');
         });
-        
-        // Обработчик присоединения нового пира (пользователя) к комнате
-        room.onPeerJoin((peerId) => {
-            console.log(`Пир присоединился: ${peerId}`);
-            if (peerId !== currentPeerId) {
-                statusDiv.innerHTML = `🔗 Подключено к ${peerId}!`;
-                transferBlock.style.display = 'block';
-                currentRoom = room;
-                sendAction = sendFile;
-            }
-        });
-        
-        // Обработчик отключения пира
-        room.onPeerLeave((peerId) => {
-            console.log(`Пир отключился: ${peerId}`);
-            if (peerId !== currentPeerId) {
-                statusDiv.innerHTML = '🔌 Соединение разорвано.';
-                transferBlock.style.display = 'none';
-                currentRoom = null;
-                sendAction = null;
-            }
-        });
-        
-        // Получаем список всех пиров в комнате
-        const peers = room.getPeers();
-        if (peers.length > 0) {
-            // Если в комнате уже есть кто-то, кроме нас, считаем, что подключились
-            const otherPeers = peers.filter(p => p !== currentPeerId);
-            if (otherPeers.length > 0) {
-                statusDiv.innerHTML = `🔗 Уже подключено к ${otherPeers[0]}!`;
-                transferBlock.style.display = 'block';
-                currentRoom = room;
-                sendAction = sendFile;
-            }
-        }
-        
-        // Сохраняем комнату, даже если пока нет других пиров
-        currentRoom = room;
-        sendAction = sendFile;
-        statusDiv.innerHTML = '✅ Готов к подключению. Отправь свой ID другу.';
     }
 
-    // Инициализируем подключение при загрузке страницы
-    connectToRoom();
+    function clearTransferUI() {
+        if (dataChannel) try { dataChannel.close(); } catch(e) {}
+        if (peerConnection) try { peerConnection.close(); } catch(e) {}
+        dataChannel = null;
+        peerConnection = null;
+        isConnected = false;
+        fileZone.style.display = 'none';
+        receivedContainer.innerHTML = '';
+        updateSignal(false);
+    }
 
-    // Обработчик кнопки "Подключиться" (логика для ручного подключения)
-    connectBtn.addEventListener('click', () => {
-        const remoteId = peerIdInput.value.trim();
-        if (!remoteId) {
-            statusDiv.innerHTML = '⚠️ Введите ID друга.';
-            return;
+    function appendReceivedFile(fileName, fileBlob) {
+        const url = URL.createObjectURL(fileBlob);
+        const sizeMB = (fileBlob.size / (1024 * 1024)).toFixed(2);
+        const row = document.createElement('div');
+        row.className = 'file-row fade';
+        row.innerHTML = `<span>📄 ${fileName} (${sizeMB} MB)</span><a href="${url}" download="${fileName}">⬇️ скачать</a>`;
+        receivedContainer.prepend(row);
+        setStatus(`✅ получен: ${fileName}`);
+    }
+
+    function createPeerConnection(isInitiator, targetRoomId) {
+        const pc = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]
+        });
+
+        if (isInitiator) {
+            dataChannel = pc.createDataChannel('lobedron-transfer');
+            dataChannel.onopen = () => { isConnected = true; setStatus('✅ data channel открыт'); fileZone.style.display = 'block'; updateSignal(true); };
+            dataChannel.onclose = () => { isConnected = false; fileZone.style.display = 'none'; setStatus('🔌 data channel закрыт'); updateSignal(false); };
+            dataChannel.onmessage = (e) => {
+                try {
+                    const msg = JSON.parse(e.data);
+                    if (msg.fileName && msg.fileData) {
+                        const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
+                        appendReceivedFile(msg.fileName, new Blob([bytes]));
+                    }
+                } catch(err) {}
+            };
+        } else {
+            pc.ondatachannel = (ev) => {
+                dataChannel = ev.channel;
+                dataChannel.onopen = () => { isConnected = true; setStatus('✅ data channel открыт'); fileZone.style.display = 'block'; updateSignal(true); };
+                dataChannel.onclose = () => { isConnected = false; fileZone.style.display = 'none'; setStatus('🔌 data channel закрыт'); updateSignal(false); };
+                dataChannel.onmessage = (e) => {
+                    try {
+                        const msg = JSON.parse(e.data);
+                        if (msg.fileName && msg.fileData) {
+                            const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
+                            appendReceivedFile(msg.fileName, new Blob([bytes]));
+                        }
+                    } catch(err) {}
+                };
+            };
         }
-        
-        if (currentRoom) {
-            // Принудительно показываем, что мы пытаемся подключиться
-            statusDiv.innerHTML = `🔄 Подключение к ${remoteId}...`;
-            // В Trystero нет явного метода "connect", так как подключение происходит через общую комнату.
-            // Просто выводим сообщение, что нужно ждать, пока друг тоже войдёт в комнату.
-            setTimeout(() => {
-                statusDiv.innerHTML = `✅ Ожидаем подключения ${remoteId}. Убедись, что он тоже открыл эту страницу.`;
-            }, 2000);
+
+        pc.onicecandidate = (ev) => { if (ev.candidate) socket.emit('ice-candidate', { to: targetRoomId, candidate: ev.candidate }); };
+        pc.onconnectionstatechange = () => {
+            if (pc.connectionState === 'connected') { isConnected = true; updateSignal(true); setStatus('🔗 соединение установлено'); fileZone.style.display = 'block'; }
+            else if (pc.connectionState === 'failed' || pc.connectionState === 'closed') { clearTransferUI(); setStatus('❌ соединение потеряно'); updateSignal(false); }
+        };
+        return pc;
+    }
+
+    function leaveRoom() {
+        if (currentRoomId) socket.emit('leave-room', { roomId: currentRoomId });
+        clearTransferUI();
+        currentRoomId = null;
+    }
+
+    function resetToMainMenu() {
+        dynamicArea.innerHTML = '';
+        showCreate.style.display = 'inline-block';
+        showJoin.style.display = 'inline-block';
+        fileZone.style.display = 'none';
+        receivedContainer.innerHTML = '';
+        setStatus('');
+        leaveRoom();
+    }
+
+    function showCreatePanel() {
+        dynamicArea.innerHTML = createPanelHtml;
+        showCreate.style.display = 'none';
+        showJoin.style.display = 'none';
+        const createRoomBtn = document.getElementById('createRoomBtn');
+        const backBtn = document.getElementById('backFromCreate');
+        const myRoomInput = document.getElementById('myRoomName');
+        createRoomBtn.onclick = () => {
+            const rid = myRoomInput.value.trim();
+            if (!rid.match(/^[a-zA-Z0-9_.\-]{3,20}$/)) { setStatus('❌ ID: 3-20 символов (буквы, цифры, _ . -)', true); return; }
+            leaveRoom();
+            currentRoomId = rid;
+            socket.emit('create-room', { roomId: currentRoomId });
+        };
+        backBtn.onclick = () => { resetToMainMenu(); };
+        // обновляем индикатор на начальное состояние (отключён)
+        updateSignal(false);
+    }
+
+    function showJoinPanel() {
+        dynamicArea.innerHTML = joinPanelHtml;
+        showCreate.style.display = 'none';
+        showJoin.style.display = 'none';
+        const joinRoomBtn = document.getElementById('joinRoomBtn');
+        const backBtn = document.getElementById('backFromJoin');
+        const joinRoomInput = document.getElementById('joinRoomName');
+        joinRoomBtn.onclick = () => {
+            const rid = joinRoomInput.value.trim();
+            if (!rid) { setStatus('❌ введи ID комнаты', true); return; }
+            leaveRoom();
+            currentRoomId = rid;
+            socket.emit('join-room', { roomId: currentRoomId });
+        };
+        backBtn.onclick = () => { resetToMainMenu(); };
+        updateSignal(false);
+    }
+
+    socket.on('connect', () => setStatus('✅ сервер готов'));
+    socket.on('offer', async ({ from, offer }) => {
+        if (!currentRoomId || from !== currentRoomId || peerConnection) return;
+        peerConnection = createPeerConnection(false, currentRoomId);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit('answer', { to: currentRoomId, answer });
+    });
+    socket.on('answer', async ({ answer }) => {
+        if (peerConnection && peerConnection.signalingState !== 'closed')
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    });
+    socket.on('ice-candidate', async ({ candidate }) => {
+        if (peerConnection && candidate) try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
+    });
+    socket.on('room-created', ({ roomId }) => {
+        if (roomId === currentRoomId) setStatus(`✅ комната "${roomId}" создана, ждём друга...`);
+    });
+    socket.on('room-join-success', ({ roomId }) => {
+        if (roomId === currentRoomId) {
+            setStatus(`🔗 вошёл в "${roomId}", соединяемся...`);
+            if (!peerConnection) {
+                peerConnection = createPeerConnection(true, currentRoomId);
+                peerConnection.createOffer().then(offer => peerConnection.setLocalDescription(offer))
+                    .then(() => socket.emit('offer', { to: currentRoomId, offer: peerConnection.localDescription }));
+            }
         }
     });
+    socket.on('room-error', ({ message }) => setStatus(`⚠️ ${message}`, true));
 
-    // Отправка файла
-    sendBtn.addEventListener('click', async () => {
-        if (!sendAction) {
-            statusDiv.innerHTML = '❌ Нет активного подключения. Сначала дождитесь подключения друга.';
-            return;
-        }
-        
+    sendBtn.onclick = () => {
+        if (!fileInput.files.length) { setStatus('⚠️ выбери файл', true); return; }
+        if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') { setStatus('❌ нет активного соединения', true); return; }
         const file = fileInput.files[0];
-        if (!file) {
-            statusDiv.innerHTML = '⚠️ Выбери файл для отправки.';
-            return;
-        }
-        
-        statusDiv.innerHTML = `📤 Отправка "${file.name}"...`;
-        
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            // Используем действие sendAction, которое мы получили из комнаты
-            await sendAction({
-                file: arrayBuffer,
-                name: file.name,
-                size: file.size,
-                type: file.type
-            });
-            statusDiv.innerHTML = `✅ Файл "${file.name}" отправлен!`;
-            fileInput.value = ''; // Очищаем поле выбора файла
-        } catch (error) {
-            console.error('Ошибка отправки:', error);
-            statusDiv.innerHTML = `❌ Ошибка при отправке файла.`;
-        }
-    });
+        setStatus(`📤 отправка ${file.name}...`);
+        const reader = new FileReader();
+        reader.onload = () => {
+            const base64 = reader.result.split(',')[1];
+            dataChannel.send(JSON.stringify({ fileName: file.name, fileData: base64 }));
+            setStatus(`✅ файл отправлен`);
+            fileInput.value = '';
+        };
+        reader.readAsDataURL(file);
+    };
+
+    showCreate.onclick = showCreatePanel;
+    showJoin.onclick = showJoinPanel;
+    window.addEventListener('beforeunload', () => { if (currentRoomId) socket.emit('leave-room', { roomId: currentRoomId }); });
+
+    // Инициализация
+    resetToMainMenu();
+    updateSignal(false);
 </script>
 </body>
 </html>
