@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>LOBEDRON | Обмен файлами</title>
+    <title>LOBEDRON SHARE</title>
     <style>
         * {
             margin: 0;
@@ -167,17 +167,20 @@
     <footer>LOBEDRON P2P — файлы идут напрямую, никто не видит</footer>
 </div>
 
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script>
-    // Публичный сервер PeerJS (бесплатный, не требует настройки)
-    const peer = new Peer({
-        host: '0.peerjs.com',
-        port: 443,
-        path: '/',
-        secure: true
-    });
+<script type="importmap">
+    {
+        "imports": {
+            "trystero": "https://esm.run/trystero"
+        }
+    }
+</script>
 
-    let currentConnection = null;
+<script type="module">
+    import { joinRoom } from 'trystero';
+    
+    let currentRoom = null;
+    let currentPeerId = null;
+    let sendAction = null;
 
     const statusDiv = document.getElementById('status');
     const myIdDiv = document.getElementById('myId');
@@ -188,84 +191,150 @@
     const sendBtn = document.getElementById('sendBtn');
     const receivedList = document.getElementById('receivedList');
 
-    peer.on('open', (id) => {
-        myIdDiv.innerText = id;
-        statusDiv.innerHTML = '✅ Готов. Скопируй ID и отправь другу.';
-    });
+    // Уникальный идентификатор твоего приложения
+    const APP_ID = 'lobedron-share-v1';
+    const ROOM_ID = 'lobedron-main-room';
 
-    peer.on('connection', (conn) => {
-        currentConnection = conn;
-        setupConnection(conn);
-        statusDiv.innerHTML = '🔗 Друг подключился! Можете обмениваться файлами.';
-        transferBlock.style.display = 'block';
-    });
+    // Функция для генерации короткого ID (для отображения)
+    function generateShortId() {
+        return Math.random().toString(36).substring(2, 10);
+    }
 
-    peer.on('error', (err) => {
-        console.error(err);
-        statusDiv.innerHTML = '❌ Ошибка: ' + err.type + '. Обнови страницу и попробуй ещё раз.';
-    });
+    // Получаем или создаём ID для этого экземпляра
+    let storedPeerId = localStorage.getItem('lobedron_peer_id');
+    if (!storedPeerId) {
+        storedPeerId = generateShortId();
+        localStorage.setItem('lobedron_peer_id', storedPeerId);
+    }
+    currentPeerId = storedPeerId;
+    myIdDiv.innerText = currentPeerId;
 
-    connectBtn.addEventListener('click', () => {
-        const remoteId = peerIdInput.value.trim();
-        if (!remoteId) return;
-        const conn = peer.connect(remoteId);
-        currentConnection = conn;
-        setupConnection(conn);
-        statusDiv.innerHTML = '🔄 Подключение...';
-        transferBlock.style.display = 'block';
-    });
-
-    function setupConnection(conn) {
-        conn.on('open', () => {
-            statusDiv.innerHTML = '✅ Соединение установлено! Выбери файл.';
-        });
-        conn.on('data', (data) => {
-            if (data && data.type === 'file') {
-                const blob = new Blob([data.file], { type: data.fileType });
+    // Функция для подключения к комнате
+    function connectToRoom() {
+        if (currentRoom) {
+            // Если уже есть подключение, отключаемся
+            // (В Trystero нет явного метода disconnect, но мы можем просто пересоздать комнату)
+        }
+        
+        // Создаём/подключаемся к комнате. Стратегия по умолчанию - Nostr.
+        // Альтернативы: 'trystero/torrent', 'trystero/ipfs', 'trystero/mqtt'
+        const room = joinRoom({ appId: APP_ID }, ROOM_ID);
+        
+        // [sendFile, onReceiveFile] = room.makeAction('file-transfer')
+        const [sendFile, onReceiveFile] = room.makeAction('file-transfer');
+        
+        // Обработчик получения файла
+        onReceiveFile(async (data, peerId) => {
+            console.log(`Получен файл от ${peerId}`, data);
+            // data - это объект, который мы отправили: { file: ArrayBuffer, name: string, size: number }
+            if (data && data.file) {
+                const blob = new Blob([data.file]);
                 const url = URL.createObjectURL(blob);
-                const fileSizeMB = (data.fileSize / 1024 / 1024).toFixed(2);
+                const fileSizeMB = (data.size / 1024 / 1024).toFixed(2);
                 const div = document.createElement('div');
                 div.className = 'received-file';
                 div.innerHTML = `
-                    <span>📄 ${data.fileName} (${fileSizeMB} MB)</span>
-                    <a href="${url}" download="${data.fileName}">⬇️ Скачать</a>
+                    <span>📄 ${data.name} (${fileSizeMB} MB)</span>
+                    <a href="${url}" download="${data.name}">⬇️ Скачать</a>
                 `;
                 receivedList.prepend(div);
-                statusDiv.innerHTML = `📥 Получен файл: ${data.fileName}`;
+                statusDiv.innerHTML = `📥 Получен файл: ${data.name}`;
             }
         });
-        conn.on('close', () => {
-            statusDiv.innerHTML = '🔌 Соединение разорвано.';
-            transferBlock.style.display = 'none';
-            currentConnection = null;
+        
+        // Обработчик присоединения нового пира (пользователя) к комнате
+        room.onPeerJoin((peerId) => {
+            console.log(`Пир присоединился: ${peerId}`);
+            if (peerId !== currentPeerId) {
+                statusDiv.innerHTML = `🔗 Подключено к ${peerId}!`;
+                transferBlock.style.display = 'block';
+                currentRoom = room;
+                sendAction = sendFile;
+            }
         });
+        
+        // Обработчик отключения пира
+        room.onPeerLeave((peerId) => {
+            console.log(`Пир отключился: ${peerId}`);
+            if (peerId !== currentPeerId) {
+                statusDiv.innerHTML = '🔌 Соединение разорвано.';
+                transferBlock.style.display = 'none';
+                currentRoom = null;
+                sendAction = null;
+            }
+        });
+        
+        // Получаем список всех пиров в комнате
+        const peers = room.getPeers();
+        if (peers.length > 0) {
+            // Если в комнате уже есть кто-то, кроме нас, считаем, что подключились
+            const otherPeers = peers.filter(p => p !== currentPeerId);
+            if (otherPeers.length > 0) {
+                statusDiv.innerHTML = `🔗 Уже подключено к ${otherPeers[0]}!`;
+                transferBlock.style.display = 'block';
+                currentRoom = room;
+                sendAction = sendFile;
+            }
+        }
+        
+        // Сохраняем комнату, даже если пока нет других пиров
+        currentRoom = room;
+        sendAction = sendFile;
+        statusDiv.innerHTML = '✅ Готов к подключению. Отправь свой ID другу.';
     }
 
-    sendBtn.addEventListener('click', () => {
-        if (!currentConnection) {
-            statusDiv.innerHTML = '❌ Нет подключения. Сначала подключись к другу.';
+    // Инициализируем подключение при загрузке страницы
+    connectToRoom();
+
+    // Обработчик кнопки "Подключиться" (логика для ручного подключения)
+    connectBtn.addEventListener('click', () => {
+        const remoteId = peerIdInput.value.trim();
+        if (!remoteId) {
+            statusDiv.innerHTML = '⚠️ Введите ID друга.';
             return;
         }
+        
+        if (currentRoom) {
+            // Принудительно показываем, что мы пытаемся подключиться
+            statusDiv.innerHTML = `🔄 Подключение к ${remoteId}...`;
+            // В Trystero нет явного метода "connect", так как подключение происходит через общую комнату.
+            // Просто выводим сообщение, что нужно ждать, пока друг тоже войдёт в комнату.
+            setTimeout(() => {
+                statusDiv.innerHTML = `✅ Ожидаем подключения ${remoteId}. Убедись, что он тоже открыл эту страницу.`;
+            }, 2000);
+        }
+    });
+
+    // Отправка файла
+    sendBtn.addEventListener('click', async () => {
+        if (!sendAction) {
+            statusDiv.innerHTML = '❌ Нет активного подключения. Сначала дождитесь подключения друга.';
+            return;
+        }
+        
         const file = fileInput.files[0];
         if (!file) {
             statusDiv.innerHTML = '⚠️ Выбери файл для отправки.';
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            currentConnection.send({
-                type: 'file',
-                file: e.target.result,
-                fileName: file.name,
-                fileType: file.type,
-                fileSize: file.size
+        
+        statusDiv.innerHTML = `📤 Отправка "${file.name}"...`;
+        
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            // Используем действие sendAction, которое мы получили из комнаты
+            await sendAction({
+                file: arrayBuffer,
+                name: file.name,
+                size: file.size,
+                type: file.type
             });
-            statusDiv.innerHTML = `📤 Отправка "${file.name}"...`;
-            setTimeout(() => {
-                statusDiv.innerHTML = `✅ Файл отправлен!`;
-            }, 1000);
-        };
-        reader.readAsArrayBuffer(file);
+            statusDiv.innerHTML = `✅ Файл "${file.name}" отправлен!`;
+            fileInput.value = ''; // Очищаем поле выбора файла
+        } catch (error) {
+            console.error('Ошибка отправки:', error);
+            statusDiv.innerHTML = `❌ Ошибка при отправке файла.`;
+        }
     });
 </script>
 </body>
