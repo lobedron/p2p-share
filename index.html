@@ -253,7 +253,13 @@
             margin-top: 12px;
         }
     </style>
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "trystero": "https://esm.run/trystero"
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -301,7 +307,9 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { joinRoom } from 'trystero';
+
     // ---------- ФОН (звёзды + дождь) ----------
     const canvas = document.getElementById('dynamicCanvas');
     const ctx = canvas.getContext('2d');
@@ -353,13 +361,14 @@
     resizeCanvas();
     drawBackground();
 
-    // ---------- PEERJS с альтернативным сервером ----------
-    let peer = null;
-    let currentConnection = null;
-    let dataChannel = null;
-    let isConnected = false;
-    let isHost = false;
+    // ---------- ЛОГИКА TRYSTERO ----------
+    let room = null;
+    let sendChat = null;
+    let sendFileAction = null;
     let currentRoomId = null;
+    let isInLobby = false;
+    let isConnected = false; // есть ли другой участник в комнате
+    let myPeerId = null;
 
     const startPanel = document.getElementById('startPanel');
     const lobbyPanel = document.getElementById('lobbyPanel');
@@ -391,89 +400,94 @@
         setStatus(text, true);
     }
 
-    function initPeer(callback) {
-        if (peer && peer.destroyed === false) { callback(true); return; }
-        // Используем альтернативный публичный сервер, более стабильный
-        peer = new Peer({ host: 'peerjs-server.herokuapp.com', port: 443, path: '/', secure: true, debug: 1 });
-        peer.on('open', (id) => {
-            setStatus(`✅ Ваш ID: ${id}`);
-            callback(true);
-        });
-        peer.on('error', (err) => {
-            console.error(err);
-            showError(`Ошибка PeerJS: ${err.type}`);
-            callback(false);
-        });
-        peer.on('connection', (conn) => {
-            if (currentConnection) conn.close();
-            currentConnection = conn;
-            setupDataChannelFromPeer(conn);
-        });
+    function addChatMessage(sender, text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message';
+        if (sender === 'вы') msgDiv.classList.add('own');
+        msgDiv.innerText = `${sender}: ${text}`;
+        chatMessagesDiv.appendChild(msgDiv);
+        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
     }
 
-    function createRoom() {
-        if (!peer || peer.destroyed) { showError('Peer не инициализирован'); return; }
-        isHost = true;
-        currentRoomId = peer.id;
-        enterLobby(currentRoomId, true);
-        setStatus(`Комната создана. Ваш ID: ${currentRoomId}. Отправьте его другу.`);
-    }
+    function setupRoomCallbacks() {
+        if (!room) return;
+        // Получаем действия
+        const [sendChatAction, receiveChat] = room.makeAction('chat');
+        const [sendFileActionFn, receiveFile] = room.makeAction('file');
+        sendChat = sendChatAction;
+        sendFileAction = sendFileActionFn;
 
-    function joinRoom(roomId) {
-        if (!peer || peer.destroyed) { showError('Peer не инициализирован'); return; }
-        isHost = false;
-        currentRoomId = roomId;
-        const conn = peer.connect(roomId, { reliable: true });
-        currentConnection = conn;
-        setupDataChannelFromPeer(conn);
-        conn.on('error', (err) => {
-            showError(`Не удалось подключиться к ${roomId}`);
-            leaveLobby();
+        receiveChat((data, peerId) => {
+            addChatMessage('собеседник', data.text);
         });
-        conn.on('open', () => {
-            setStatus(`Подключено к комнате ${roomId}`);
-            enterLobby(roomId, false);
+        receiveFile(async (data, peerId) => {
+            // data: { fileName, fileData (base64) }
+            const bytes = Uint8Array.from(atob(data.fileData), c => c.charCodeAt(0));
+            const blob = new Blob([bytes]);
+            const url = URL.createObjectURL(blob);
+            const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+            const row = document.createElement('div');
+            row.className = 'file-row';
+            row.innerHTML = `<span>📄 ${data.fileName} (${sizeMB} MB)</span><a href="${url}" download="${data.fileName}">⬇️ скачать</a>`;
+            receivedFilesList.prepend(row);
+            setStatus(`✅ получен файл: ${data.fileName}`);
         });
-    }
 
-    function setupDataChannelFromPeer(conn) {
-        conn.on('data', (data) => {
-            try {
-                const msg = JSON.parse(data);
-                if (msg.type === 'chat') {
-                    addChatMessage('собеседник', msg.text);
-                } else if (msg.type === 'file') {
-                    const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
-                    const blob = new Blob([bytes]);
-                    const url = URL.createObjectURL(blob);
-                    const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
-                    const row = document.createElement('div');
-                    row.className = 'file-row';
-                    row.innerHTML = `<span>📄 ${msg.fileName} (${sizeMB} MB)</span><a href="${url}" download="${msg.fileName}">⬇️ скачать</a>`;
-                    receivedFilesList.prepend(row);
-                    setStatus(`✅ получен файл: ${msg.fileName}`);
-                }
-            } catch(e) {}
-        });
-        conn.on('open', () => {
-            isConnected = true;
-            if (lobbyPanel.style.display === 'block') {
+        // Отслеживание подключения/отключения пиров
+        room.onPeerJoin((peerId) => {
+            if (peerId !== myPeerId) {
+                isConnected = true;
                 participantStatusSpan.innerText = 'Соединение установлено!';
                 chatInput.disabled = false;
                 sendChatBtn.disabled = false;
                 fileZone.style.display = 'block';
+                setStatus('🔗 участник подключился');
             }
         });
-        conn.on('close', () => {
-            isConnected = false;
-            if (lobbyPanel.style.display === 'block') {
-                participantStatusSpan.innerText = 'Соединение потеряно';
+        room.onPeerLeave((peerId) => {
+            if (peerId !== myPeerId) {
+                isConnected = false;
+                participantStatusSpan.innerText = 'Участник отключился. Ожидание...';
                 chatInput.disabled = true;
                 sendChatBtn.disabled = true;
                 fileZone.style.display = 'none';
+                setStatus('🔌 участник отключился');
             }
         });
-        dataChannel = conn;
+        // Текущие пиры
+        const peers = room.getPeers();
+        const otherPeers = peers.filter(p => p !== myPeerId);
+        if (otherPeers.length > 0) {
+            isConnected = true;
+            participantStatusSpan.innerText = 'Соединение установлено!';
+            chatInput.disabled = false;
+            sendChatBtn.disabled = false;
+            fileZone.style.display = 'block';
+        }
+    }
+
+    function createRoom(roomId) {
+        if (room) {
+            // если уже есть комната, выходим
+        }
+        currentRoomId = roomId;
+        room = joinRoom({ appId: `lobedron_${roomId}` }, roomId);
+        myPeerId = room.getPeers()[0] || 'host';
+        setupRoomCallbacks();
+        enterLobby(roomId, true);
+        setStatus(`Комната "${roomId}" создана. Ждём подключения друга...`);
+    }
+
+    function joinRoomById(roomId) {
+        if (room) {
+            // покидаем старую комнату
+        }
+        currentRoomId = roomId;
+        room = joinRoom({ appId: `lobedron_${roomId}` }, roomId);
+        myPeerId = room.getPeers()[0] || 'guest';
+        setupRoomCallbacks();
+        enterLobby(roomId, false);
+        setStatus(`Подключение к комнате "${roomId}"...`);
     }
 
     function enterLobby(roomId, host) {
@@ -486,49 +500,36 @@
         sendChatBtn.disabled = true;
         fileZone.style.display = 'none';
         receivedFilesList.innerHTML = '';
-        if (!host && currentConnection && currentConnection.open) {
-            participantStatusSpan.innerText = 'Соединение установлено!';
-            chatInput.disabled = false;
-            sendChatBtn.disabled = false;
-            fileZone.style.display = 'block';
-            isConnected = true;
-        } else if (host && currentConnection && currentConnection.open) {
-            participantStatusSpan.innerText = 'Соединение установлено!';
-            chatInput.disabled = false;
-            sendChatBtn.disabled = false;
-            fileZone.style.display = 'block';
-            isConnected = true;
-        }
-    }
-
-    function addChatMessage(sender, text) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'message';
-        if (sender === 'вы') msgDiv.classList.add('own');
-        msgDiv.innerText = `${sender}: ${text}`;
-        chatMessagesDiv.appendChild(msgDiv);
-        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        isConnected = false;
+        // Проверяем, есть ли уже другие участники
+        setTimeout(() => {
+            if (room) {
+                const peers = room.getPeers();
+                const otherPeers = peers.filter(p => p !== myPeerId);
+                if (otherPeers.length > 0) {
+                    isConnected = true;
+                    participantStatusSpan.innerText = 'Соединение установлено!';
+                    chatInput.disabled = false;
+                    sendChatBtn.disabled = false;
+                    fileZone.style.display = 'block';
+                }
+            }
+        }, 500);
     }
 
     function sendChatMessage(text) {
-        if (!currentConnection || currentConnection.open !== true) {
-            setStatus('❌ нет соединения', true);
-            return;
-        }
-        currentConnection.send(JSON.stringify({ type: 'chat', text }));
+        if (!sendChat) { setStatus('❌ нет соединения', true); return; }
+        sendChat({ text });
         addChatMessage('вы', text);
     }
 
     function sendFile(file) {
-        if (!currentConnection || currentConnection.open !== true) {
-            setStatus('❌ нет соединения', true);
-            return;
-        }
+        if (!sendFileAction) { setStatus('❌ нет соединения', true); return; }
         setStatus(`📤 отправка ${file.name}...`);
         const reader = new FileReader();
         reader.onload = () => {
             const base64 = reader.result.split(',')[1];
-            currentConnection.send(JSON.stringify({ type: 'file', fileName: file.name, fileData: base64 }));
+            sendFileAction({ fileName: file.name, fileData: base64 });
             setStatus(`✅ файл отправлен`);
             fileInput.value = '';
         };
@@ -536,9 +537,14 @@
     }
 
     function leaveLobby() {
-        if (currentConnection) currentConnection.close();
-        currentConnection = null;
+        if (room) {
+            // Trystero не имеет явного метода leave, но можно удалить ссылку
+            room = null;
+        }
+        sendChat = null;
+        sendFileAction = null;
         isConnected = false;
+        currentRoomId = null;
         startPanel.style.display = 'block';
         lobbyPanel.style.display = 'none';
         setStatus('');
@@ -548,9 +554,10 @@
     const createPanelHtml = `
         <div id="createPanel" class="action-panel" style="display: block;">
             <div class="input-group">
-                <label>ID комнаты (будет создан автоматически)</label>
-                <button id="doCreateBtn" style="margin-top: 8px;">✨ СОЗДАТЬ КОМНАТУ</button>
+                <label>ID комнаты</label>
+                <input type="text" id="createRoomId" maxlength="20" placeholder="ID">
             </div>
+            <button id="doCreateBtn">✨ СОЗДАТЬ КОМНАТУ</button>
             <button id="backFromCreate" class="back-btn">← НАЗАД</button>
         </div>
     `;
@@ -569,10 +576,12 @@
         dynamicArea.innerHTML = createPanelHtml;
         const createBtn = document.getElementById('doCreateBtn');
         const backBtn = document.getElementById('backFromCreate');
+        const input = document.getElementById('createRoomId');
         createBtn.onclick = () => {
-            initPeer((ok) => {
-                if (ok) createRoom();
-            });
+            const rid = input.value.trim();
+            if (!rid) { showError('Введите ID комнаты'); return; }
+            if (rid.length > 20) { showError('ID не длиннее 20 символов'); return; }
+            createRoom(rid);
         };
         backBtn.onclick = () => { dynamicArea.innerHTML = ''; };
     }
@@ -586,9 +595,7 @@
             const rid = input.value.trim();
             if (!rid) { showError('Введите ID комнаты'); return; }
             if (rid.length > 20) { showError('ID не длиннее 20 символов'); return; }
-            initPeer((ok) => {
-                if (ok) joinRoom(rid);
-            });
+            joinRoomById(rid);
         };
         backBtn.onclick = () => { dynamicArea.innerHTML = ''; };
     }
@@ -611,8 +618,6 @@
         else setStatus('⚠️ выбери файл', true);
     };
 
-    // Инициализация
-    initPeer(() => {});
     startPanel.style.display = 'block';
     lobbyPanel.style.display = 'none';
 </script>
