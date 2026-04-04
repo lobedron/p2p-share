@@ -353,13 +353,13 @@
     resizeCanvas();
     drawBackground();
 
-    // ---------- PEERJS ----------
+    // ---------- PEERJS с альтернативным сервером ----------
     let peer = null;
     let currentConnection = null;
     let dataChannel = null;
     let isConnected = false;
     let isHost = false;
-    let currentRoomId = null; // здесь храним peer ID создателя (если мы хост) или введённый ID для подключения
+    let currentRoomId = null;
 
     const startPanel = document.getElementById('startPanel');
     const lobbyPanel = document.getElementById('lobbyPanel');
@@ -391,15 +391,16 @@
         setStatus(text, true);
     }
 
-    // Инициализация Peer (один раз)
     function initPeer(callback) {
-        if (peer && peer.destroyed === false) { callback(); return; }
-        peer = new Peer({ host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 1 });
+        if (peer && peer.destroyed === false) { callback(true); return; }
+        // Используем альтернативный публичный сервер, более стабильный
+        peer = new Peer({ host: 'peerjs-server.herokuapp.com', port: 443, path: '/', secure: true, debug: 1 });
         peer.on('open', (id) => {
             setStatus(`✅ Ваш ID: ${id}`);
-            callback();
+            callback(true);
         });
         peer.on('error', (err) => {
+            console.error(err);
             showError(`Ошибка PeerJS: ${err.type}`);
             callback(false);
         });
@@ -410,24 +411,16 @@
         });
     }
 
-    // Создание комнаты (хост)
     function createRoom() {
-        if (!peer || peer.destroyed) {
-            showError('Peer не инициализирован');
-            return;
-        }
+        if (!peer || peer.destroyed) { showError('Peer не инициализирован'); return; }
         isHost = true;
-        currentRoomId = peer.id; // ID хоста — это ID комнаты
+        currentRoomId = peer.id;
         enterLobby(currentRoomId, true);
         setStatus(`Комната создана. Ваш ID: ${currentRoomId}. Отправьте его другу.`);
     }
 
-    // Подключение к комнате (гость)
     function joinRoom(roomId) {
-        if (!peer || peer.destroyed) {
-            showError('Peer не инициализирован');
-            return;
-        }
+        if (!peer || peer.destroyed) { showError('Peer не инициализирован'); return; }
         isHost = false;
         currentRoomId = roomId;
         const conn = peer.connect(roomId, { reliable: true });
@@ -618,7 +611,7 @@
         else setStatus('⚠️ выбери файл', true);
     };
 
-    // Инициализация Peer при старте (чтобы не ждать)
+    // Инициализация
     initPeer(() => {});
     startPanel.style.display = 'block';
     lobbyPanel.style.display = 'none';
