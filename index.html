@@ -3,6 +3,718 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>LOBEDRON SHARE — dark studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            font-family: 'Manrope', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        /* динамический фон (звёзды + дождь) */
+        #dynamicCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* облака / размытые пятна */
+        .cloud {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* основной контейнер с параллаксом */
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 28px 24px 32px;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* стеклянная карточка */
+        .glass-card {
+            background: rgba(18, 20, 24, 0.85);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            border-radius: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02);
+            transition: box-shadow 0.3s ease, transform 0.2s;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 35px 55px -15px rgba(0, 0, 0, 1);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .sub {
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            margin-bottom: 32px;
+            text-transform: uppercase;
+        }
+
+        /* верхняя панель: две кнопки по краям */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .action-btn {
+            background: rgba(20, 22, 27, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            min-width: 160px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .action-btn:hover {
+            background: rgba(35, 38, 45, 0.9);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px -10px black;
+        }
+
+        /* панели действий (анимированные) */
+        .action-panel {
+            display: none;
+            margin: 20px 0;
+            animation: panelFadeIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        @keyframes panelFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel-closing {
+            animation: panelFadeOut 0.25s forwards !important;
+        }
+
+        @keyframes panelFadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(15px);
+                display: none;
+            }
+        }
+
+        /* индикатор сигнала — центрирован */
+        .signal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            margin: 0 auto 20px auto;
+            width: fit-content;
+            transition: opacity 0.2s;
+        }
+
+        .signal-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 5px;
+            height: 22px;
+        }
+
+        .bar {
+            width: 5px;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.2s;
+            border-radius: 3px;
+        }
+        .bar1 { height: 6px; }
+        .bar2 { height: 10px; }
+        .bar3 { height: 14px; }
+
+        .signal.disconnected .bar {
+            background: rgba(255,255,255,0.15);
+            opacity: 0.6;
+        }
+        .signal-cross {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            display: none;
+        }
+        .signal.disconnected .signal-cross {
+            display: inline-block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(10, 12, 18, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 18px;
+            border-radius: 44px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: #0c0f16;
+            box-shadow: 0 0 12px rgba(255,255,255,0.05);
+        }
+
+        button {
+            width: 100%;
+            background: rgba(25, 28, 35, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 44px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: #2a2e38;
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .back-btn {
+            background: rgba(15, 17, 22, 0.7);
+            margin-top: 4px;
+        }
+
+        /* панель файлов */
+        .file-panel {
+            margin-top: 28px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 24px;
+            transition: all 0.3s;
+        }
+
+        .file-row {
+            background: rgba(15, 17, 25, 0.7);
+            backdrop-filter: blur(5px);
+            border-radius: 24px;
+            padding: 12px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.2s;
+        }
+
+        .file-row:hover {
+            background: rgba(30, 33, 45, 0.8);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .file-row a {
+            color: #ccc;
+            text-decoration: none;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+        .file-row a:hover {
+            background: #2f384b;
+            color: white;
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            margin-top: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        /* анимация для кнопки назад */
+        .fade-out {
+            animation: fadeOutEl 0.25s forwards;
+        }
+
+        @keyframes fadeOutEl {
+            to { opacity: 0; transform: scale(0.98); display: none; }
+        }
+
+    </style>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+
+<canvas id="dynamicCanvas"></canvas>
+<div class="cloud" style="width: 500px; height: 500px; top: -10%; left: -10%;"></div>
+<div class="cloud" style="width: 700px; height: 700px; bottom: -20%; right: -10%;"></div>
+
+<div class="container" id="mainContainer">
+    <div class="glass-card" style="padding: 28px 26px 32px;">
+        <h1>⚡ LOBESHARE</h1>
+        <div class="sub">кастомный Файлообменник</div>
+
+        <div class="top-bar">
+            <button id="showCreateBtn" class="action-btn">📎 СОЗДАТЬ</button>
+            <button id="showJoinBtn" class="action-btn">🔗 ПОДКЛЮЧИТЬСЯ</button>
+        </div>
+
+        <div id="dynamicArea"></div>
+
+        <div id="fileTransferZone" style="display: none;" class="file-panel">
+            <div class="input-group">
+                <label>📁 ВЫБРАТЬ ФАЙЛ</label>
+                <input type="file" id="fileInput">
+            </div>
+            <button id="sendFileBtn">📤 ОТПРАВИТЬ ФАЙЛ</button>
+            <div style="margin: 20px 0 10px; font-weight: 500;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
+            <div id="receivedFilesList"></div>
+        </div>
+
+        <div id="statusMessage" class="status-text"></div>
+    </div>
+</div>
+
+
+<script>
+    // ---------- ФОН (звёзды + дождь) ----------
+    const canvas = document.getElementById('dynamicCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let stars = [], drops = [];
+    let mouseX = 0, mouseY = 0;
+
+    function resizeCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        initStars();
+        initDrops();
+    }
+
+    function initStars() {
+        stars = [];
+        for(let i=0; i<150; i++) {
+            stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 2.5,
+                alpha: Math.random() * 0.8,
+                driftX: (Math.random() - 0.5) * 0.2,
+                driftY: (Math.random() - 0.5) * 0.2
+            });
+        }
+    }
+
+    function initDrops() {
+        drops = [];
+        for(let i=0; i<100; i++) {
+            drops.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                len: Math.random() * 20 + 12,
+                speed: Math.random() * 8 + 5
+            });
+        }
+    }
+
+    function drawBackground() {
+        ctx.clearRect(0, 0, width, height);
+        // звёзды с параллаксом от мыши
+        stars.forEach(s => {
+            let offsetX = mouseX * 25;
+            let offsetY = mouseY * 15;
+            let sx = s.x + offsetX;
+            let sy = s.y + offsetY;
+            if(sx < 0) sx += width;
+            if(sx > width) sx -= width;
+            if(sy < 0) sy += height;
+            if(sy > height) sy -= height;
+            ctx.fillStyle = `rgba(255,255,255,${s.alpha * 0.6})`;
+            ctx.beginPath();
+            ctx.arc(sx, sy, s.size, 0, Math.PI*2);
+            ctx.fill();
+        });
+
+        // дождь
+        ctx.strokeStyle = "rgba(255,255,255,0.12)";
+        ctx.lineWidth = 1.2;
+        drops.forEach(d => {
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(d.x, d.y + d.len);
+            ctx.stroke();
+            d.y += d.speed;
+            if(d.y > height) {
+                d.y = -d.len;
+                d.x = Math.random() * width;
+            }
+        });
+        requestAnimationFrame(drawBackground);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / width) - 0.5;
+        mouseY = (e.clientY / height) - 0.5;
+        const container = document.getElementById('mainContainer');
+        if(container) container.style.transform = `translate(${mouseX * 10}px, ${mouseY * 10}px)`;
+    });
+
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+    });
+    resizeCanvas();
+    drawBackground();
+
+    
+
+    // ---------- ФАЙЛООБМЕННИК (КОМНАТЫ) ----------
+    const SIGNALING_SERVER = 'https://webrtc-signal-server-2.onrender.com';
+    const socket = io(SIGNALING_SERVER, { transports: ['websocket', 'polling'] });
+
+    let currentRoomId = null;
+    let peerConnection = null;
+    let dataChannel = null;
+    let isConnected = false;
+
+    const showCreate = document.getElementById('showCreateBtn');
+    const showJoin = document.getElementById('showJoinBtn');
+    const dynamicArea = document.getElementById('dynamicArea');
+    const fileZone = document.getElementById('fileTransferZone');
+    const fileInput = document.getElementById('fileInput');
+    const sendBtn = document.getElementById('sendFileBtn');
+    const receivedContainer = document.getElementById('receivedFilesList');
+    const statusMsg = document.getElementById('statusMessage');
+
+    // шаблоны панелей с индикатором внутри
+    const createPanelHtml = `
+        <div id="createPanel" class="action-panel" style="display: block;">
+            <div id="signalCreate" class="signal disconnected">
+                <div class="signal-bars"><div class="bar bar1"></div><div class="bar bar2"></div><div class="bar bar3"></div></div>
+                <span class="signal-cross">✕</span>
+            </div>
+            <div class="input-group"><label>ID комнаты</label><input type="text" id="myRoomName" placeholder="ID" maxlength="20"></div>
+            <button id="createRoomBtn">СОЗДАТЬ КОМНАТУ</button>
+            <button id="backFromCreate" class="back-btn">← НАЗАД</button>
+        </div>
+    `;
+    const joinPanelHtml = `
+        <div id="joinPanel" class="action-panel" style="display: block;">
+            <div id="signalJoin" class="signal disconnected">
+                <div class="signal-bars"><div class="bar bar1"></div><div class="bar bar2"></div><div class="bar bar3"></div></div>
+                <span class="signal-cross">✕</span>
+            </div>
+            <div class="input-group"><label>ID комнаты</label><input type="text" id="joinRoomName" placeholder="ID"></div>
+            <button id="joinRoomBtn">🔗 ПОДКЛЮЧИТЬСЯ</button>
+            <button id="backFromJoin" class="back-btn">← НАЗАД</button>
+        </div>
+    `;
+
+    function setStatus(text, isError = false) {
+        statusMsg.innerHTML = text;
+        if (isError) setTimeout(() => { if (statusMsg.innerHTML === text) statusMsg.innerHTML = ''; }, 3000);
+    }
+
+    function updateSignal(connected) {
+        document.querySelectorAll('.signal').forEach(sig => {
+            if (connected) sig.classList.remove('disconnected');
+            else sig.classList.add('disconnected');
+        });
+    }
+
+    function clearTransferUI() {
+        if (dataChannel) try { dataChannel.close(); } catch(e) {}
+        if (peerConnection) try { peerConnection.close(); } catch(e) {}
+        dataChannel = null;
+        peerConnection = null;
+        isConnected = false;
+        fileZone.style.display = 'none';
+        receivedContainer.innerHTML = '';
+        updateSignal(false);
+    }
+
+    function appendReceivedFile(fileName, fileBlob) {
+        const url = URL.createObjectURL(fileBlob);
+        const sizeMB = (fileBlob.size / (1024 * 1024)).toFixed(2);
+        const row = document.createElement('div');
+        row.className = 'file-row';
+        row.innerHTML = `<span>📄 ${fileName} (${sizeMB} MB)</span><a href="${url}" download="${fileName}">⬇️ скачать</a>`;
+        receivedContainer.prepend(row);
+        setStatus(`✅ получен: ${fileName}`);
+    }
+
+    function createPeerConnection(isInitiator, targetRoomId) {
+        const pc = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]
+        });
+        if (isInitiator) {
+            dataChannel = pc.createDataChannel('lobedron-transfer');
+            dataChannel.onopen = () => { isConnected = true; setStatus('✅ data channel открыт'); fileZone.style.display = 'block'; updateSignal(true); };
+            dataChannel.onclose = () => { isConnected = false; fileZone.style.display = 'none'; setStatus('🔌 data channel закрыт'); updateSignal(false); };
+            dataChannel.onmessage = (e) => {
+                try {
+                    const msg = JSON.parse(e.data);
+                    if (msg.fileName && msg.fileData) {
+                        const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
+                        appendReceivedFile(msg.fileName, new Blob([bytes]));
+                    }
+                } catch(err) {}
+            };
+        } else {
+            pc.ondatachannel = (ev) => {
+                dataChannel = ev.channel;
+                dataChannel.onopen = () => { isConnected = true; setStatus('✅ data channel открыт'); fileZone.style.display = 'block'; updateSignal(true); };
+                dataChannel.onclose = () => { isConnected = false; fileZone.style.display = 'none'; setStatus('🔌 data channel закрыт'); updateSignal(false); };
+                dataChannel.onmessage = (e) => {
+                    try {
+                        const msg = JSON.parse(e.data);
+                        if (msg.fileName && msg.fileData) {
+                            const bytes = Uint8Array.from(atob(msg.fileData), c => c.charCodeAt(0));
+                            appendReceivedFile(msg.fileName, new Blob([bytes]));
+                        }
+                    } catch(err) {}
+                };
+            };
+        }
+        pc.onicecandidate = (ev) => { if (ev.candidate) socket.emit('ice-candidate', { to: targetRoomId, candidate: ev.candidate }); };
+        pc.onconnectionstatechange = () => {
+            if (pc.connectionState === 'connected') { isConnected = true; updateSignal(true); setStatus('🔗 соединение установлено'); fileZone.style.display = 'block'; }
+            else if (pc.connectionState === 'failed' || pc.connectionState === 'closed') { clearTransferUI(); setStatus('❌ соединение потеряно'); updateSignal(false); }
+        };
+        return pc;
+    }
+
+    function leaveRoom() {
+        if (currentRoomId) socket.emit('leave-room', { roomId: currentRoomId });
+        clearTransferUI();
+        currentRoomId = null;
+    }
+
+    function animatePanelClose(panelElement, callback) {
+        if (!panelElement) { if(callback) callback(); return; }
+        panelElement.classList.add('panel-closing');
+        setTimeout(() => {
+            panelElement.style.display = 'none';
+            panelElement.classList.remove('panel-closing');
+            if(callback) callback();
+        }, 250);
+    }
+
+    function resetToMainMenu() {
+        // если есть открытая панель, анимируем закрытие
+        const activePanel = document.querySelector('.action-panel');
+        if (activePanel) {
+            animatePanelClose(activePanel, () => {
+                dynamicArea.innerHTML = '';
+                showCreate.style.display = 'inline-block';
+                showJoin.style.display = 'inline-block';
+                fileZone.style.display = 'none';
+                receivedContainer.innerHTML = '';
+                setStatus('');
+                leaveRoom();
+            });
+        } else {
+            dynamicArea.innerHTML = '';
+            showCreate.style.display = 'inline-block';
+            showJoin.style.display = 'inline-block';
+            fileZone.style.display = 'none';
+            receivedContainer.innerHTML = '';
+            setStatus('');
+            leaveRoom();
+        }
+    }
+
+    function showCreatePanel() {
+        const existing = document.querySelector('.action-panel');
+        if (existing) {
+            animatePanelClose(existing, () => {
+                dynamicArea.innerHTML = createPanelHtml;
+                showCreate.style.display = 'none';
+                showJoin.style.display = 'none';
+                attachCreateEvents();
+                updateSignal(false);
+            });
+        } else {
+            dynamicArea.innerHTML = createPanelHtml;
+            showCreate.style.display = 'none';
+            showJoin.style.display = 'none';
+            attachCreateEvents();
+            updateSignal(false);
+        }
+    }
+
+    function attachCreateEvents() {
+        const createRoomBtn = document.getElementById('createRoomBtn');
+        const backBtn = document.getElementById('backFromCreate');
+        const myRoomInput = document.getElementById('myRoomName');
+        createRoomBtn.onclick = () => {
+            const rid = myRoomInput.value.trim();
+            if (!rid.match(/^[a-zA-Z0-9_.\-]{3,20}$/)) { setStatus('❌ ID: 3-20 символов (буквы, цифры, _ . -)', true); return; }
+            leaveRoom();
+            currentRoomId = rid;
+            socket.emit('create-room', { roomId: currentRoomId });
+        };
+        backBtn.onclick = () => resetToMainMenu();
+    }
+
+    function showJoinPanel() {
+        const existing = document.querySelector('.action-panel');
+        if (existing) {
+            animatePanelClose(existing, () => {
+                dynamicArea.innerHTML = joinPanelHtml;
+                showCreate.style.display = 'none';
+                showJoin.style.display = 'none';
+                attachJoinEvents();
+                updateSignal(false);
+            });
+        } else {
+            dynamicArea.innerHTML = joinPanelHtml;
+            showCreate.style.display = 'none';
+            showJoin.style.display = 'none';
+            attachJoinEvents();
+            updateSignal(false);
+        }
+    }
+
+    function attachJoinEvents() {
+        const joinRoomBtn = document.getElementById('joinRoomBtn');
+        const backBtn = document.getElementById('backFromJoin');
+        const joinRoomInput = document.getElementById('joinRoomName');
+        joinRoomBtn.onclick = () => {
+            const rid = joinRoomInput.value.trim();
+            if (!rid) { setStatus('❌ введи ID комнаты', true); return; }
+            leaveRoom();
+            currentRoomId = rid;
+            socket.emit('join-room', { roomId: currentRoomId });
+        };
+        backBtn.onclick = () => resetToMainMenu();
+    }
+
+    socket.on('connect', () => setStatus('✅ сервер готов'));
+    socket.on('offer', async ({ from, offer }) => {
+        if (!currentRoomId || from !== currentRoomId || peerConnection) return;
+        peerConnection = createPeerConnection(false, currentRoomId);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit('answer', { to: currentRoomId, answer });
+    });
+    socket.on('answer', async ({ answer }) => {
+        if (peerConnection && peerConnection.signalingState !== 'closed')
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    });
+    socket.on('ice-candidate', async ({ candidate }) => {
+        if (peerConnection && candidate) try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
+    });
+    socket.on('room-created', ({ roomId }) => {
+        if (roomId === currentRoomId) setStatus(`✅ комната "${roomId}" создана, ждём друга...`);
+    });
+    socket.on('room-join-success', ({ roomId }) => {
+        if (roomId === currentRoomId) {
+            setStatus(`🔗 вошёл в "${roomId}", соединяемся...`);
+            if (!peerConnection) {
+                peerConnection = createPeerConnection(true, currentRoomId);
+                peerConnection.createOffer().then(offer => peerConnection.setLocalDescription(offer))
+                    .then(() => socket.emit('offer', { to: currentRoomId, offer: peerConnection.localDescription }));
+            }
+        }
+    });
+    socket.on('room-error', ({ message }) => setStatus(`⚠️ ${message}`, true));
+
+    sendBtn.onclick = () => {
+        if (!fileInput.files.length) { setStatus('⚠️ выбери файл', true); return; }
+        if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') { setStatus('❌ нет активного соединения', true); return; }
+        const file = fileInput.files[0];
+        setStatus(`📤 отправка ${file.name}...`);
+        const reader = new FileReader();
+        reader.onload = () => {
+            const base64 = reader.result.split(',')[1];
+            dataChannel.send(JSON.stringify({ fileName: file.name, fileData: base64 }));
+            setStatus(`✅ файл отправлен`);
+            fileInput.value = '';
+        };
+        reader.readAsDataURL(file);
+    };
+
+    showCreate.onclick = showCreatePanel;
+    showJoin.onclick = showJoinPanel;
+    window.addEventListener('beforeunload', () => { if (currentRoomId) socket.emit('leave-room', { roomId: currentRoomId }); });
+
+    resetToMainMenu();
+    updateSignal(false);
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>LOBEDRON SHARE</title>
     <style>
         * {
