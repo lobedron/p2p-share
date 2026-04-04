@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>LOBEDRON SHARE — dark studio</title>
+    <title>LOBEDRON SHARE</title>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #000;
             font-family: 'Manrope', sans-serif;
@@ -23,7 +18,6 @@
             position: relative;
             perspective: 1000px;
         }
-
         #dynamicCanvas {
             position: fixed;
             top: 0; left: 0;
@@ -31,7 +25,6 @@
             z-index: -2;
             pointer-events: none;
         }
-
         .cloud {
             position: absolute;
             background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%);
@@ -40,7 +33,6 @@
             z-index: -1;
             pointer-events: none;
         }
-
         .container {
             position: relative;
             z-index: 10;
@@ -50,30 +42,25 @@
             padding: 20px;
             transition: transform 0.1s ease-out;
         }
-
         .glass-card {
             background: rgba(18, 20, 24, 0.85);
             backdrop-filter: blur(35px);
-            -webkit-backdrop-filter: blur(35px);
             border-radius: 48px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02);
-            transition: box-shadow 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.8);
             padding: 28px 26px 32px;
         }
-
         h1 {
             font-size: 2rem;
             font-weight: 800;
             letter-spacing: -2px;
-            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            background: linear-gradient(135deg, #fff, #aaa);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             text-align: center;
             margin-bottom: 8px;
         }
-
         .sub {
             text-align: center;
             color: rgba(255,255,255,0.5);
@@ -82,7 +69,6 @@
             margin-bottom: 32px;
             text-transform: uppercase;
         }
-
         .top-bar {
             display: flex;
             align-items: center;
@@ -90,43 +76,35 @@
             gap: 24px;
             margin-bottom: 28px;
         }
-
         .action-btn {
-            background: rgba(20, 22, 27, 0.7);
+            background: rgba(20,22,27,0.7);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 12px 28px;
             border-radius: 60px;
             font-weight: 700;
             font-size: 0.9rem;
             color: #fff;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            transition: 0.25s;
             min-width: 160px;
             text-align: center;
         }
-
         .action-btn:hover {
-            background: rgba(35, 38, 45, 0.9);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(35,38,45,0.9);
+            border-color: rgba(255,255,255,0.3);
             transform: translateY(-2px);
         }
-
         .action-panel {
             display: none;
             margin: 20px 0;
             animation: fadeIn 0.3s ease;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
+        .input-group { margin-bottom: 20px; }
         label {
             font-size: 0.7rem;
             color: rgba(255,255,255,0.6);
@@ -135,59 +113,45 @@
             display: block;
             margin-bottom: 8px;
         }
-
-        input, textarea {
+        input {
             width: 100%;
-            background: rgba(10, 12, 18, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10,12,18,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 14px 18px;
             border-radius: 44px;
             color: white;
             font-size: 0.9rem;
             outline: none;
-            transition: all 0.2s;
-            font-family: inherit;
         }
-
-        textarea {
-            border-radius: 24px;
-            resize: vertical;
-        }
-
-        input:focus, textarea:focus {
-            border-color: rgba(255, 255, 255, 0.4);
+        input:focus {
+            border-color: rgba(255,255,255,0.4);
             background: #0c0f16;
         }
-
         button {
             width: 100%;
-            background: rgba(25, 28, 35, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(25,28,35,0.9);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 12px 20px;
             border-radius: 44px;
             font-weight: 600;
             color: #fff;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: 0.2s;
             margin-bottom: 12px;
         }
-
         button:hover {
             background: #2a2e38;
-            border-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255,255,255,0.3);
             transform: translateY(-1px);
         }
-
         .back-btn {
-            background: rgba(15, 17, 22, 0.7);
+            background: rgba(15,17,22,0.7);
             margin-top: 4px;
         }
-
         .lobby-container {
             display: none;
             animation: fadeIn 0.3s ease;
         }
-
         .lobby-header {
             display: flex;
             justify-content: space-between;
@@ -196,7 +160,6 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-
         .room-id-badge {
             background: rgba(0,0,0,0.5);
             padding: 6px 14px;
@@ -205,18 +168,15 @@
             font-size: 0.8rem;
             border: 1px solid rgba(255,255,255,0.2);
         }
-
         .participant-status {
             color: rgba(255,255,255,0.6);
             font-size: 0.75rem;
         }
-
         .chat-area {
             margin: 20px 0;
             border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 20px;
         }
-
         .messages {
             background: rgba(0,0,0,0.3);
             border-radius: 24px;
@@ -228,7 +188,6 @@
             flex-direction: column;
             gap: 8px;
         }
-
         .message {
             background: rgba(255,255,255,0.05);
             padding: 8px 12px;
@@ -238,46 +197,39 @@
             word-break: break-word;
             font-size: 0.85rem;
         }
-
         .message.own {
             align-self: flex-end;
-            background: rgba(100, 108, 255, 0.2);
+            background: rgba(100,108,255,0.2);
             border: 1px solid rgba(100,108,255,0.3);
         }
-
         .chat-input {
             display: flex;
             gap: 12px;
         }
-
         .chat-input input {
             flex: 1;
             margin-bottom: 0;
         }
-
         .chat-input button {
             width: auto;
             padding: 0 24px;
             margin-bottom: 0;
         }
-
         .file-panel {
             margin-top: 24px;
             border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 20px;
         }
-
         .file-row {
-            background: rgba(15, 17, 25, 0.7);
+            background: rgba(15,17,25,0.7);
             border-radius: 24px;
             padding: 12px 18px;
             margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.05);
         }
-
         .file-row a {
             color: #ccc;
             text-decoration: none;
@@ -286,14 +238,12 @@
             border-radius: 40px;
             font-size: 0.75rem;
         }
-
         .status-text {
             font-size: 0.75rem;
             color: rgba(255,255,255,0.5);
             text-align: center;
             margin-top: 20px;
         }
-
         .error-msg {
             color: #ff8888;
             background: rgba(255,0,0,0.1);
@@ -302,13 +252,8 @@
             text-align: center;
             margin-top: 12px;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
     </style>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body>
 
@@ -321,7 +266,6 @@
         <h1>⚡ LOBESHARE</h1>
         <div class="sub">кастомный файлообменник</div>
 
-        <!-- Начальные кнопки -->
         <div id="startPanel">
             <div class="top-bar">
                 <button id="showCreateBtn" class="action-btn">📎 СОЗДАТЬ</button>
@@ -330,11 +274,10 @@
             <div id="dynamicArea"></div>
         </div>
 
-        <!-- Лобби (комната) -->
         <div id="lobbyPanel" class="lobby-container">
             <div class="lobby-header">
                 <div class="room-id-badge" id="lobbyRoomId">—</div>
-                <div class="participant-status" id="participantStatus">Ожидание подключения...</div>
+                <div class="participant-status" id="participantStatus">Ожидание...</div>
             </div>
             <div class="chat-area">
                 <div class="messages" id="chatMessages"></div>
@@ -352,9 +295,8 @@
                 <div style="margin: 16px 0 8px; font-weight: 500;">📥 ПОЛУЧЕННЫЕ ФАЙЛЫ</div>
                 <div id="receivedFilesList"></div>
             </div>
-            <button id="leaveLobbyBtn" class="back-btn">← ВЫЙТИ ИЗ КОМНАТЫ</button>
+            <button id="leaveLobbyBtn" class="back-btn">← ВЫЙТИ</button>
         </div>
-
         <div id="statusMessage" class="status-text"></div>
     </div>
 </div>
@@ -373,84 +315,51 @@
         initStars();
         initDrops();
     }
-
     function initStars() {
         stars = [];
-        for(let i=0; i<150; i++) {
-            stars.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                size: Math.random() * 2.5,
-                alpha: Math.random() * 0.8,
-            });
-        }
+        for(let i=0; i<150; i++) stars.push({ x: Math.random()*width, y: Math.random()*height, size: Math.random()*2.5, alpha: Math.random()*0.8 });
     }
-
     function initDrops() {
         drops = [];
-        for(let i=0; i<100; i++) {
-            drops.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                len: Math.random() * 20 + 12,
-                speed: Math.random() * 8 + 5
-            });
-        }
+        for(let i=0; i<100; i++) drops.push({ x: Math.random()*width, y: Math.random()*height, len: Math.random()*20+12, speed: Math.random()*8+5 });
     }
-
     function drawBackground() {
-        ctx.clearRect(0, 0, width, height);
+        ctx.clearRect(0,0,width,height);
         stars.forEach(s => {
-            let offsetX = mouseX * 25;
-            let offsetY = mouseY * 15;
-            let sx = s.x + offsetX;
-            let sy = s.y + offsetY;
-            if(sx < 0) sx += width;
-            if(sx > width) sx -= width;
-            if(sy < 0) sy += height;
-            if(sy > height) sy -= height;
-            ctx.fillStyle = `rgba(255,255,255,${s.alpha * 0.6})`;
-            ctx.beginPath();
-            ctx.arc(sx, sy, s.size, 0, Math.PI*2);
-            ctx.fill();
+            let offsetX = mouseX*25, offsetY = mouseY*15;
+            let sx = s.x+offsetX, sy = s.y+offsetY;
+            if(sx<0) sx+=width; if(sx>width) sx-=width;
+            if(sy<0) sy+=height; if(sy>height) sy-=height;
+            ctx.fillStyle = `rgba(255,255,255,${s.alpha*0.6})`;
+            ctx.beginPath(); ctx.arc(sx,sy,s.size,0,Math.PI*2); ctx.fill();
         });
         ctx.strokeStyle = "rgba(255,255,255,0.12)";
         ctx.lineWidth = 1.2;
         drops.forEach(d => {
-            ctx.beginPath();
-            ctx.moveTo(d.x, d.y);
-            ctx.lineTo(d.x, d.y + d.len);
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x,d.y+d.len); ctx.stroke();
             d.y += d.speed;
-            if(d.y > height) {
-                d.y = -d.len;
-                d.x = Math.random() * width;
-            }
+            if(d.y>height) { d.y = -d.len; d.x = Math.random()*width; }
         });
         requestAnimationFrame(drawBackground);
     }
-
     window.addEventListener('mousemove', (e) => {
         if(width && height) {
-            mouseX = (e.clientX / width) - 0.5;
-            mouseY = (e.clientY / height) - 0.5;
-            const container = document.getElementById('mainContainer');
-            if(container) container.style.transform = `translate(${mouseX * 10}px, ${mouseY * 10}px)`;
+            mouseX = (e.clientX/width)-0.5;
+            mouseY = (e.clientY/height)-0.5;
+            document.getElementById('mainContainer').style.transform = `translate(${mouseX*10}px, ${mouseY*10}px)`;
         }
     });
-
-    window.addEventListener('resize', () => { resizeCanvas(); });
+    window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
     drawBackground();
 
-    // ---------- ЛОГИКА КОМНАТ И ЧАТА ----------
-    const SIGNALING_SERVER = 'https://webrtc-signal-server-2.onrender.com';
-    let socket = null;
-    let currentRoomId = null;
-    let isInLobby = false;
-    let peerConnection = null;
+    // ---------- PEERJS ----------
+    let peer = null;
+    let currentConnection = null;
     let dataChannel = null;
     let isConnected = false;
+    let isHost = false;
+    let currentRoomId = null; // здесь храним peer ID создателя (если мы хост) или введённый ID для подключения
 
     const startPanel = document.getElementById('startPanel');
     const lobbyPanel = document.getElementById('lobbyPanel');
@@ -469,15 +378,10 @@
     const receivedFilesList = document.getElementById('receivedFilesList');
     const leaveLobbyBtn = document.getElementById('leaveLobbyBtn');
 
-    let isHost = false;
-
     function setStatus(text, isError = false) {
         statusMsg.innerHTML = text;
-        if (isError) setTimeout(() => {
-            if (statusMsg.innerHTML === text) statusMsg.innerHTML = '';
-        }, 4000);
+        if (isError) setTimeout(() => { if (statusMsg.innerHTML === text) statusMsg.innerHTML = ''; }, 4000);
     }
-
     function showError(text) {
         const errDiv = document.createElement('div');
         errDiv.className = 'error-msg';
@@ -487,208 +391,62 @@
         setStatus(text, true);
     }
 
-    function connectToSignaling(callback) {
-        if (socket && socket.connected) {
-            callback(true);
-            return;
-        }
-        socket = io(SIGNALING_SERVER, { transports: ['websocket', 'polling'] });
-        socket.on('connect', () => {
-            setStatus('✅ сигнальный сервер готов');
-            callback(true);
+    // Инициализация Peer (один раз)
+    function initPeer(callback) {
+        if (peer && peer.destroyed === false) { callback(); return; }
+        peer = new Peer({ host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 1 });
+        peer.on('open', (id) => {
+            setStatus(`✅ Ваш ID: ${id}`);
+            callback();
         });
-        socket.on('connect_error', (err) => {
-            showError('❌ не удалось подключиться к сигнальному серверу. Проверьте интернет.');
+        peer.on('error', (err) => {
+            showError(`Ошибка PeerJS: ${err.type}`);
             callback(false);
         });
-    }
-
-    function createRoom(roomId) {
-        if (!socket || !socket.connected) {
-            showError('Нет соединения с сервером');
-            return;
-        }
-        socket.emit('create-room', { roomId }, (response) => {
-            if (response && response.error) {
-                showError(`Ошибка: ${response.error}`);
-                return;
-            }
-            enterLobby(roomId, true);
+        peer.on('connection', (conn) => {
+            if (currentConnection) conn.close();
+            currentConnection = conn;
+            setupDataChannelFromPeer(conn);
         });
     }
 
-    function joinRoom(roomId) {
-        if (!socket || !socket.connected) {
-            showError('Нет соединения с сервером');
+    // Создание комнаты (хост)
+    function createRoom() {
+        if (!peer || peer.destroyed) {
+            showError('Peer не инициализирован');
             return;
         }
-        socket.emit('join-room', { roomId }, (response) => {
-            if (response && response.error) {
-                showError(`Ошибка: ${response.error}`);
-                return;
-            }
+        isHost = true;
+        currentRoomId = peer.id; // ID хоста — это ID комнаты
+        enterLobby(currentRoomId, true);
+        setStatus(`Комната создана. Ваш ID: ${currentRoomId}. Отправьте его другу.`);
+    }
+
+    // Подключение к комнате (гость)
+    function joinRoom(roomId) {
+        if (!peer || peer.destroyed) {
+            showError('Peer не инициализирован');
+            return;
+        }
+        isHost = false;
+        currentRoomId = roomId;
+        const conn = peer.connect(roomId, { reliable: true });
+        currentConnection = conn;
+        setupDataChannelFromPeer(conn);
+        conn.on('error', (err) => {
+            showError(`Не удалось подключиться к ${roomId}`);
+            leaveLobby();
+        });
+        conn.on('open', () => {
+            setStatus(`Подключено к комнате ${roomId}`);
             enterLobby(roomId, false);
         });
     }
 
-    function enterLobby(roomId, host) {
-        currentRoomId = roomId;
-        isHost = host;
-        isInLobby = true;
-        startPanel.style.display = 'none';
-        lobbyPanel.style.display = 'block';
-        lobbyRoomIdSpan.innerText = roomId;
-        participantStatusSpan.innerText = host ? 'Ожидание подключения участника...' : 'Подключение к комнате...';
-        chatMessagesDiv.innerHTML = '';
-        chatInput.disabled = true;
-        sendChatBtn.disabled = true;
-        fileZone.style.display = 'none';
-        receivedFilesList.innerHTML = '';
-
-        socket.off('user-joined');
-        socket.off('user-left');
-        socket.off('room-message');
-        socket.off('webrtc-offer');
-        socket.off('webrtc-answer');
-        socket.off('webrtc-candidate');
-        socket.off('file-transfer');
-
-        socket.on('user-joined', (data) => {
-            if (data.roomId === currentRoomId) {
-                participantStatusSpan.innerText = 'Участник подключился! Устанавливаем соединение...';
-                if (isHost) {
-                    initWebRTC(true);
-                }
-            }
-        });
-
-        socket.on('user-left', (data) => {
-            if (data.roomId === currentRoomId) {
-                participantStatusSpan.innerText = 'Участник отключился. Ожидание...';
-                if (peerConnection) peerConnection.close();
-                peerConnection = null;
-                dataChannel = null;
-                isConnected = false;
-                fileZone.style.display = 'none';
-                chatInput.disabled = true;
-                sendChatBtn.disabled = true;
-            }
-        });
-
-        socket.on('room-message', (data) => {
-            if (data.roomId === currentRoomId) {
-                addChatMessage(data.sender, data.text);
-            }
-        });
-
-        socket.on('webrtc-offer', async (data) => {
-            if (data.roomId === currentRoomId && !isHost) {
-                await handleOffer(data.offer);
-            }
-        });
-
-        socket.on('webrtc-answer', async (data) => {
-            if (data.roomId === currentRoomId && isHost && peerConnection) {
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-            }
-        });
-
-        socket.on('webrtc-candidate', async (data) => {
-            if (data.roomId === currentRoomId && peerConnection) {
-                try {
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-                } catch(e) {}
-            }
-        });
-
-        socket.on('file-transfer', async (data) => {
-            if (data.roomId === currentRoomId && data.fileData && data.fileName) {
-                const bytes = Uint8Array.from(atob(data.fileData), c => c.charCodeAt(0));
-                const blob = new Blob([bytes]);
-                const url = URL.createObjectURL(blob);
-                const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
-                const row = document.createElement('div');
-                row.className = 'file-row';
-                row.innerHTML = `<span>📄 ${data.fileName} (${sizeMB} MB)</span><a href="${url}" download="${data.fileName}">⬇️ скачать</a>`;
-                receivedFilesList.prepend(row);
-                setStatus(`✅ получен файл: ${data.fileName}`);
-            }
-        });
-
-        if (!host) {
-            socket.emit('request-webrtc', { roomId: currentRoomId });
-        }
-    }
-
-    async function initWebRTC(isInitiator) {
-        const configuration = {
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]
-        };
-        peerConnection = new RTCPeerConnection(configuration);
-
-        if (isInitiator) {
-            dataChannel = peerConnection.createDataChannel('lobedron-channel');
-            setupDataChannel();
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-            socket.emit('webrtc-offer', { roomId: currentRoomId, offer });
-        } else {
-            peerConnection.ondatachannel = (event) => {
-                dataChannel = event.channel;
-                setupDataChannel();
-            };
-        }
-
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit('webrtc-candidate', { roomId: currentRoomId, candidate: event.candidate });
-            }
-        };
-
-        peerConnection.onconnectionstatechange = () => {
-            if (peerConnection.connectionState === 'connected') {
-                isConnected = true;
-                participantStatusSpan.innerText = 'Соединение установлено!';
-                chatInput.disabled = false;
-                sendChatBtn.disabled = false;
-                fileZone.style.display = 'block';
-                setStatus('🔗 соединение активно');
-            } else if (peerConnection.connectionState === 'failed') {
-                isConnected = false;
-                participantStatusSpan.innerText = 'Ошибка соединения';
-                setStatus('❌ соединение не удалось', true);
-            }
-        };
-    }
-
-    async function handleOffer(offer) {
-        if (!peerConnection) {
-            await initWebRTC(false);
-        }
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-        socket.emit('webrtc-answer', { roomId: currentRoomId, answer });
-    }
-
-    function setupDataChannel() {
-        if (!dataChannel) return;
-        dataChannel.onopen = () => {
-            isConnected = true;
-            participantStatusSpan.innerText = 'Соединение установлено!';
-            chatInput.disabled = false;
-            sendChatBtn.disabled = false;
-            fileZone.style.display = 'block';
-        };
-        dataChannel.onclose = () => {
-            isConnected = false;
-            chatInput.disabled = true;
-            sendChatBtn.disabled = true;
-            fileZone.style.display = 'none';
-        };
-        dataChannel.onmessage = (event) => {
+    function setupDataChannelFromPeer(conn) {
+        conn.on('data', (data) => {
             try {
-                const msg = JSON.parse(event.data);
+                const msg = JSON.parse(data);
                 if (msg.type === 'chat') {
                     addChatMessage('собеседник', msg.text);
                 } else if (msg.type === 'file') {
@@ -703,7 +461,51 @@
                     setStatus(`✅ получен файл: ${msg.fileName}`);
                 }
             } catch(e) {}
-        };
+        });
+        conn.on('open', () => {
+            isConnected = true;
+            if (lobbyPanel.style.display === 'block') {
+                participantStatusSpan.innerText = 'Соединение установлено!';
+                chatInput.disabled = false;
+                sendChatBtn.disabled = false;
+                fileZone.style.display = 'block';
+            }
+        });
+        conn.on('close', () => {
+            isConnected = false;
+            if (lobbyPanel.style.display === 'block') {
+                participantStatusSpan.innerText = 'Соединение потеряно';
+                chatInput.disabled = true;
+                sendChatBtn.disabled = true;
+                fileZone.style.display = 'none';
+            }
+        });
+        dataChannel = conn;
+    }
+
+    function enterLobby(roomId, host) {
+        startPanel.style.display = 'none';
+        lobbyPanel.style.display = 'block';
+        lobbyRoomIdSpan.innerText = roomId;
+        participantStatusSpan.innerText = host ? 'Ожидание подключения друга...' : 'Подключение...';
+        chatMessagesDiv.innerHTML = '';
+        chatInput.disabled = true;
+        sendChatBtn.disabled = true;
+        fileZone.style.display = 'none';
+        receivedFilesList.innerHTML = '';
+        if (!host && currentConnection && currentConnection.open) {
+            participantStatusSpan.innerText = 'Соединение установлено!';
+            chatInput.disabled = false;
+            sendChatBtn.disabled = false;
+            fileZone.style.display = 'block';
+            isConnected = true;
+        } else if (host && currentConnection && currentConnection.open) {
+            participantStatusSpan.innerText = 'Соединение установлено!';
+            chatInput.disabled = false;
+            sendChatBtn.disabled = false;
+            fileZone.style.display = 'block';
+            isConnected = true;
+        }
     }
 
     function addChatMessage(sender, text) {
@@ -716,24 +518,24 @@
     }
 
     function sendChatMessage(text) {
-        if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') {
-            setStatus('❌ нет соединения для чата', true);
+        if (!currentConnection || currentConnection.open !== true) {
+            setStatus('❌ нет соединения', true);
             return;
         }
-        dataChannel.send(JSON.stringify({ type: 'chat', text }));
+        currentConnection.send(JSON.stringify({ type: 'chat', text }));
         addChatMessage('вы', text);
     }
 
     function sendFile(file) {
-        if (!isConnected || !dataChannel || dataChannel.readyState !== 'open') {
-            setStatus('❌ нет активного соединения', true);
+        if (!currentConnection || currentConnection.open !== true) {
+            setStatus('❌ нет соединения', true);
             return;
         }
         setStatus(`📤 отправка ${file.name}...`);
         const reader = new FileReader();
         reader.onload = () => {
             const base64 = reader.result.split(',')[1];
-            dataChannel.send(JSON.stringify({ type: 'file', fileName: file.name, fileData: base64 }));
+            currentConnection.send(JSON.stringify({ type: 'file', fileName: file.name, fileData: base64 }));
             setStatus(`✅ файл отправлен`);
             fileInput.value = '';
         };
@@ -741,27 +543,21 @@
     }
 
     function leaveLobby() {
-        if (socket && currentRoomId) {
-            socket.emit('leave-room', { roomId: currentRoomId });
-        }
-        if (peerConnection) peerConnection.close();
-        peerConnection = null;
-        dataChannel = null;
+        if (currentConnection) currentConnection.close();
+        currentConnection = null;
         isConnected = false;
-        isInLobby = false;
-        currentRoomId = null;
         startPanel.style.display = 'block';
         lobbyPanel.style.display = 'none';
         setStatus('');
     }
 
+    // UI панели
     const createPanelHtml = `
         <div id="createPanel" class="action-panel" style="display: block;">
             <div class="input-group">
-                <label>ID комнаты</label>
-                <input type="text" id="myRoomName" maxlength="20">
+                <label>ID комнаты (будет создан автоматически)</label>
+                <button id="doCreateBtn" style="margin-top: 8px;">✨ СОЗДАТЬ КОМНАТУ</button>
             </div>
-            <button id="createRoomBtn">✨ СОЗДАТЬ КОМНАТУ</button>
             <button id="backFromCreate" class="back-btn">← НАЗАД</button>
         </div>
     `;
@@ -769,59 +565,39 @@
         <div id="joinPanel" class="action-panel" style="display: block;">
             <div class="input-group">
                 <label>ID комнаты</label>
-                <input type="text" id="joinRoomName" maxlength="20">
+                <input type="text" id="joinRoomId" maxlength="20" placeholder="ID">
             </div>
-            <button id="joinRoomBtn">🔗 ПОДКЛЮЧИТЬСЯ</button>
+            <button id="doJoinBtn">🔗 ПОДКЛЮЧИТЬСЯ</button>
             <button id="backFromJoin" class="back-btn">← НАЗАД</button>
         </div>
     `;
 
     function showCreatePanel() {
         dynamicArea.innerHTML = createPanelHtml;
-        const createBtn = document.getElementById('createRoomBtn');
+        const createBtn = document.getElementById('doCreateBtn');
         const backBtn = document.getElementById('backFromCreate');
-        const roomInput = document.getElementById('myRoomName');
         createBtn.onclick = () => {
-            const rid = roomInput.value.trim();
-            if (!rid) {
-                showError('Введите ID комнаты');
-                return;
-            }
-            if (rid.length > 20) {
-                showError('ID не может быть длиннее 20 символов');
-                return;
-            }
-            connectToSignaling((ok) => {
-                if (ok) createRoom(rid);
+            initPeer((ok) => {
+                if (ok) createRoom();
             });
         };
-        backBtn.onclick = () => {
-            dynamicArea.innerHTML = '';
-        };
+        backBtn.onclick = () => { dynamicArea.innerHTML = ''; };
     }
 
     function showJoinPanel() {
         dynamicArea.innerHTML = joinPanelHtml;
-        const joinBtn = document.getElementById('joinRoomBtn');
+        const joinBtn = document.getElementById('doJoinBtn');
         const backBtn = document.getElementById('backFromJoin');
-        const roomInput = document.getElementById('joinRoomName');
+        const input = document.getElementById('joinRoomId');
         joinBtn.onclick = () => {
-            const rid = roomInput.value.trim();
-            if (!rid) {
-                showError('Введите ID комнаты');
-                return;
-            }
-            if (rid.length > 20) {
-                showError('ID не может быть длиннее 20 символов');
-                return;
-            }
-            connectToSignaling((ok) => {
+            const rid = input.value.trim();
+            if (!rid) { showError('Введите ID комнаты'); return; }
+            if (rid.length > 20) { showError('ID не длиннее 20 символов'); return; }
+            initPeer((ok) => {
                 if (ok) joinRoom(rid);
             });
         };
-        backBtn.onclick = () => {
-            dynamicArea.innerHTML = '';
-        };
+        backBtn.onclick = () => { dynamicArea.innerHTML = ''; };
     }
 
     showCreateBtn.onclick = showCreatePanel;
@@ -829,10 +605,7 @@
     leaveLobbyBtn.onclick = leaveLobby;
     sendChatBtn.onclick = () => {
         const text = chatInput.value.trim();
-        if (text) {
-            sendChatMessage(text);
-            chatInput.value = '';
-        }
+        if (text) { sendChatMessage(text); chatInput.value = ''; }
     };
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && chatInput.value.trim()) {
@@ -845,6 +618,8 @@
         else setStatus('⚠️ выбери файл', true);
     };
 
+    // Инициализация Peer при старте (чтобы не ждать)
+    initPeer(() => {});
     startPanel.style.display = 'block';
     lobbyPanel.style.display = 'none';
 </script>
